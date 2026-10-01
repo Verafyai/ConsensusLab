@@ -352,3 +352,43 @@ def main(argv: list[str]) -> int:
 
 if __name__ == "__main__":
     sys.exit(main(sys.argv[1:]))
+
+
+# ------------------------------------------------------------------ knob application
+def set_path(p: dict, path: str, value: Any) -> None:
+    """Set a knob path on a protocol dict, e.g. 'rounds', 'early_stop.judge_can_end',
+    'agents[role=judge].model', 'agents[*].samples'."""
+    m = SEL.match(path)
+    if m:
+        sel, fld = m.groups()
+        for i, a in enumerate(p.get("agents", [])):
+            if sel == "*" or (sel.isdigit() and int(sel) == i) or \
+                    (sel.startswith("role=") and a.get("role") == sel[5:]):
+                a[fld] = value
+        return
+    node = p
+    parts = path.split(".")
+    for k in parts[:-1]:
+        node = node.setdefault(k, {})
+    node[parts[-1]] = value
+
+
+def apply_knobs(zid: str, sub: str, knobs: dict[str, Any], pid: str | None = None) -> dict:
+    """A protocol built from a zone template with named knob values (dashboard runs)."""
+    import copy
+    z = load(zid)
+    if sub not in z.subs:
+        raise ValueError(f"{zid} has no sub-technique {sub!r}")
+    p = copy.deepcopy(z.subs[sub])
+    for name, value in knobs.items():
+        if name not in z.knobs:
+            raise ValueError(f"{name!r} is not a {zid} knob")
+        spec = z.knobs[name]
+        if spec["path"] == "agents":
+            p["agents"] = value
+        else:
+            set_path(p, spec["path"], value)
+    p["id"] = pid or f"{p['id']}-" + "-".join(
+        f"{k}{str(v).lower().replace('.', '')[:8]}" for k, v in sorted(knobs.items())
+        if not isinstance(v, list))[:40].rstrip("-")
+    return p

@@ -104,6 +104,8 @@ class Orchestrator:
 
     def heartbeat(self, state: str, **extra) -> None:
         from harness.health import beat
+        if getattr(self, "pulse", None) is not None:
+            self.pulse.state, self.pulse.extra = state, extra
         beat("orchestrator", state, **extra)
 
     # ------------------------------------------------------------------ holdout budget
@@ -440,6 +442,9 @@ class Orchestrator:
             if paths.STOP.exists():
                 self.emit("stop", reason="ops/STOP present")
                 break
+            from lab.orchestrator import jobs
+            for job in jobs.pending():          # dashboard runs go first
+                jobs.run_job(self, job)
             try:
                 r = self.cycle()
             except BudgetExceeded as e:
@@ -516,8 +521,21 @@ def main(argv: list[str] | None = None) -> int:
     args = ap.parse_args(argv)
     from lab.experimenter.claude import ClaudeExperimenter
     from lab.orchestrator.factory import build
-    orch = build(ClaudeExperimenter(), commit=not args.no_commit)
-    orch.run(1 if args.once else args.cycles)
+    from harness.health import Pulse
+    with Pulse("orchestrator") as pulse:
+        orch = build(ClaudeExperimenter(), commit=not args.no_commit)
+        orch.pulse = pulse
+        orch.run(1 if args.once else args.cycles)
+        if not args.once and args.cycles is None:
+            # Event-driven: when budget or STOP ends the loop, stay alive (heartbeat green,
+            # state "waiting") so the dashboard queue can still be served tomorrow.
+            import time
+            from lab.orchestrator import jobs
+            while not paths.STOP.exists():
+                pulse.state = "waiting"
+                for job in jobs.pending():
+                    jobs.run_job(orch, job)
+                time.sleep(30)
     return 0
 
 

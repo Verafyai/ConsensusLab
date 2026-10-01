@@ -1,0 +1,33 @@
+# herdr-plus project template for Consensus Lab (same format as the Collective's).
+# harness/launch.sh copies this into herdr-plus's projects/ folder and fills in the path.
+name = "Consensus Lab"
+description = "Autonomous consensus experimenter for @VerafyAI"
+group = "Verafy"
+working_dir = "__LAB_ROOT__"
+
+[[tabs]]
+name = "lab"
+
+[[tabs.panes]]
+label = "orchestrator"
+command = "harness/panes/orchestrator.sh"
+
+[[tabs.panes]]
+label = "claude"
+command = "harness/panes/claude.sh"
+split = "right"
+
+[[tabs.panes]]
+label = "grok"
+command = "harness/panes/grok.sh"
+split = "down"
+
+[[tabs.panes]]
+label = "dashboard"
+command = "harness/panes/dashboard.sh"
+split = "down"
+
+[[tabs.panes]]
+label = "monitor"
+command = "harness/panes/monitor.sh"
+split = "down"

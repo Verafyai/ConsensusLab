@@ -71,3 +71,36 @@ if __name__ == "__main__":
         print(f"{'OK ' if s['ok'] else 'RED'} {c:13} {s['state']:12} {s['age_s']:>6}s "
               f"{s['why'] or ''}")
     sys.exit(0)
+
+
+class Pulse:
+    """Background heartbeat for a long-running process: beats every `interval` seconds with
+    the current state, so a busy-but-alive process never looks stale.
+
+        with Pulse("orchestrator") as p:
+            p.state = "dev"
+    """
+
+    def __init__(self, component: str, interval: float = 15.0, path: Path | None = None):
+        import threading
+        self.component, self.interval, self.path = component, interval, path
+        self.state, self.extra = "starting", {}
+        self._stop = threading.Event()
+        self._t = threading.Thread(target=self._run, daemon=True)
+
+    def _run(self) -> None:
+        while not self._stop.is_set():
+            try:
+                beat(self.component, self.state, self.path, **self.extra)
+            except OSError:
+                pass
+            self._stop.wait(self.interval)
+
+    def __enter__(self) -> Pulse:
+        self._t.start()
+        return self
+
+    def __exit__(self, *exc) -> None:
+        self._stop.set()
+        self.state = "stopped"
+        beat(self.component, "stopped", self.path, pid=0)
