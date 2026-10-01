@@ -18,6 +18,7 @@ import sys
 import tempfile
 import time
 from pathlib import Path
+from urllib.parse import urlsplit
 
 import yaml
 
@@ -47,7 +48,7 @@ def record(transcript: dict, workdir: Path, aspect: str = "square", variant: str
                                   record_video_dir=str(workdir),
                                   record_video_size={"width": w, "height": h})
         page = ctx.new_page()
-        page.route("**/__video_transcript.json", lambda r: r.fulfill(
+        page.route(lambda u: urlsplit(u).path == "/__video_transcript.json", lambda r: r.fulfill(
             status=200, content_type="application/json", body=json.dumps(transcript)))
         url = (f"{base}/replay/index.html?autoplay=1&captions=1&aspect={aspect}"
                f"&t=/__video_transcript.json" + (f"&variant={variant}" if variant else ""))

@@ -1,0 +1,42 @@
+{
+  "experiment": "SAMPLE", "protocol": "debate-judge", "item": "q-sample-0000000001", "split": "dev",
+  "question": "Lagos has more residents than the whole of Ghana.",
+  "label_set": ["supported", "refuted", "not_enough_evidence", "conflicting"],
+  "gold": "refuted",
+  "evidence": [
+    {"id": "ev1", "url": "https://statsghana.gov.gh/census-2021", "title": "2021 Population and Housing Census: General Report",
+     "published": "2021-09-22", "excerpt": "The 2021 Population and Housing Census enumerated 30,832,019 persons in Ghana, an increase of 6.2 million over the 2010 census figure.",
+     "stance": {"claude-sonnet": "refutes", "grok-fast": "refutes"}},
+    {"id": "ev2", "url": "https://lagosstate.gov.ng/about-lagos", "title": "About Lagos State",
+     "published": "2020-11-02", "excerpt": "Lagos State is home to an estimated 20 million people, making it one of the largest urban areas in Africa, though estimates vary widely.",
+     "stance": {"claude-sonnet": "neutral", "grok-fast": "supports"}},
+    {"id": "ev3", "url": "https://www.un.org/development/desa/pd/wup", "title": "World Urbanization Prospects: Lagos",
+     "published": "2019-05-16", "excerpt": "The Lagos urban agglomeration was estimated at 13.9 million residents in 2018, projected to grow rapidly through 2030.",
+     "stance": {"claude-sonnet": "refutes", "grok-fast": "refutes"}},
+    {"id": "ev4", "url": "https://www.bbc.com/news/world-africa-lagos-growth", "title": "How fast is Lagos really growing?",
+     "published": "2018-03-08", "excerpt": "Counting Lagos is notoriously hard; figures from 12 million to 21 million are quoted depending on boundaries and sources.",
+     "stance": {"claude-sonnet": "neutral", "grok-fast": "neutral"}}
+  ],
+  "turns": [
+    {"n": 1, "round": 1, "agent": "advocate-affirm", "model": "claude-sonnet", "family": "claude", "position": "affirm", "belief": 0.25,
+     "text": "Lagos State's own figure is about 20 million people (ev2), and growth there has been explosive. Some estimates of the metro area run past 21 million (ev4), which would rival a mid-sized country.",
+     "cites": ["ev2", "ev4"], "quotes": [], "tokens": 612, "usd": 0.0041, "cached": false, "refused": false},
+    {"n": 2, "round": 1, "agent": "advocate-deny", "model": "grok-fast", "family": "grok", "position": "deny", "belief": 0.1,
+     "text": "Ghana's 2021 census counted 30.8 million people (ev1). Even the highest Lagos estimate, about 21 million (ev4), falls roughly 10 million short. The UN put the city at 13.9 million (ev3).",
+     "cites": ["ev1", "ev3", "ev4"], "quotes": [], "tokens": 588, "usd": 0.0012, "cached": false, "refused": false},
+    {"n": 3, "round": 2, "agent": "advocate-affirm", "model": "claude-sonnet", "family": "claude", "position": "affirm", "belief": 0.15,
+     "text": "Counting Lagos is uncertain (ev4), so the claim could hold under the broadest boundary. But I concede no source puts Lagos above 30 million.",
+     "cites": ["ev4"], "quotes": [], "tokens": 701, "usd": 0.0046, "cached": false, "refused": false},
+    {"n": 4, "round": 2, "agent": "advocate-deny", "model": "grok-fast", "family": "grok", "position": "deny", "belief": 0.05,
+     "text": "Uncertainty about Lagos spans 12 to 21 million. None of it approaches Ghana's census total of 30.8 million. The claim is false by a wide margin.",
+     "cites": ["ev1", "ev4"], "quotes": [], "tokens": 640, "usd": 0.0013, "cached": false, "refused": false},
+    {"n": 5, "round": 3, "agent": "judge", "model": "claude-sonnet", "family": "claude", "position": "refuted", "belief": null,
+     "text": "Ghana's census counts 30.8 million people. The highest credible Lagos estimate is about 21 million. Even with uncertain city boundaries, Lagos is far smaller than Ghana.",
+     "cites": ["ev1", "ev3", "ev4"], "quotes": [], "tokens": 920, "usd": 0.0058, "cached": false, "refused": false}
+  ],
+  "agreement": [0.85, 0.9],
+  "verdict": "refuted", "confidence": 0.93,
+  "rationale": "Ghana's 2021 census counted 30.8 million people. Even the biggest estimates for Lagos are about 21 million, so the claim is false.",
+  "reasons": ["Ghana census: 30.8 million people", "Largest Lagos estimate: about 21 million"],
+  "usd": 0.017, "usd_uncached": 0.017, "latency_s": 14.2, "error": null
+}

@@ -292,11 +292,12 @@ def test_browser_static_export_is_read_only(demo, browser, tmp_path):
 
 
 def test_dashboard_job_runs_with_progress(filled_config, tmp_path, monkeypatch):
+    import shutil
+    import subprocess
+
     from lab import zones
     from lab.orchestrator import jobs
     from tests.test_e06_orchestrator import make
-    import shutil
-    import subprocess
     root = tmp_path / "jobroot"
     for d in ("experiments", "learnings", "ops/queue"):
         (root / d).mkdir(parents=True)

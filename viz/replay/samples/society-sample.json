@@ -1,0 +1,42 @@
+{
+  "experiment": "SAMPLE", "protocol": "society-3x2", "item": "q-sample-0000000002", "split": "dev",
+  "question": "In Finland's 2023 parliamentary election, the Finns Party won the second-largest number of seats.",
+  "label_set": ["supported", "refuted", "not_enough_evidence", "conflicting"],
+  "gold": "supported",
+  "evidence": [
+    {"id": "ev1", "url": "https://tulospalvelu.vaalit.fi/EKV-2023/en/tulos_kokomaa.html", "title": "Parliamentary elections 2023: results for the whole country",
+     "published": "2023-04-05", "excerpt": "National Coalition Party 48 seats, Finns Party 46 seats, Social Democratic Party 43 seats, Centre Party 23 seats. Confirmed result of the parliamentary elections held on 2 April 2023.",
+     "stance": {"claude-sonnet": "supports", "grok-fast": "supports", "claude-haiku": "supports"}},
+    {"id": "ev2", "url": "https://yle.fi/a/finland-election-results-2023", "title": "National Coalition wins election, Finns Party second",
+     "published": "2023-04-03", "excerpt": "The Finns Party took 20.1 percent of the vote and 46 seats, its best result ever, narrowly ahead of Prime Minister Sanna Marin's Social Democrats.",
+     "stance": {"claude-sonnet": "supports", "grok-fast": "supports", "claude-haiku": "supports"}},
+    {"id": "ev3", "url": "https://www.reuters.com/world/europe/finland-votes-2023-04-02/", "title": "Finland votes in tight three-way race",
+     "published": "2023-04-02", "excerpt": "Final opinion polls showed the three largest parties within two points of each other, making the order of finish impossible to call before votes are counted.",
+     "stance": {"claude-sonnet": "neutral", "grok-fast": "neutral", "claude-haiku": "neutral"}}
+  ],
+  "turns": [
+    {"n": 1, "round": 1, "agent": "agent-1", "model": "claude-sonnet", "family": "claude", "position": "supported", "belief": null,
+     "text": "The official results list 46 seats for the Finns Party, behind only the National Coalition's 48 (ev1). Yle reports the same count (ev2).",
+     "cites": ["ev1", "ev2"], "quotes": [], "tokens": 540, "usd": 0.0036, "cached": false, "refused": false},
+    {"n": 2, "round": 1, "agent": "agent-2", "model": "grok-fast", "family": "grok", "position": "supported", "belief": null,
+     "text": "Finns Party: 46 seats and 20.1% of the vote, second place (ev2). The Social Democrats came third with 43 (ev1).",
+     "cites": ["ev1", "ev2"], "quotes": [], "tokens": 498, "usd": 0.0010, "cached": false, "refused": false},
+    {"n": 3, "round": 1, "agent": "agent-3", "model": "claude-haiku", "family": "claude", "position": "not_enough_evidence", "belief": null,
+     "text": "Pre-election polling had the top three parties within two points (ev3). I can't tell from that alone who finished second.",
+     "cites": ["ev3"], "quotes": [], "tokens": 455, "usd": 0.0007, "cached": false, "refused": false},
+    {"n": 4, "round": 2, "agent": "agent-1", "model": "claude-sonnet", "family": "claude", "position": "supported", "belief": null,
+     "text": "The poll in ev3 predates the count. The certified result (ev1) settles the order: 48, 46, 43. I keep my answer.",
+     "cites": ["ev1", "ev3"], "quotes": [], "tokens": 610, "usd": 0.0040, "cached": false, "refused": false},
+    {"n": 5, "round": 2, "agent": "agent-2", "model": "grok-fast", "family": "grok", "position": "supported", "belief": null,
+     "text": "Agree with agent 1. The official count is the deciding source; polls don't change it.",
+     "cites": ["ev1"], "quotes": [], "tokens": 402, "usd": 0.0009, "cached": false, "refused": false},
+    {"n": 6, "round": 2, "agent": "agent-3", "model": "claude-haiku", "family": "claude", "position": "supported", "belief": null,
+     "text": "I missed that ev1 is the certified result. With 46 seats against 43 for the Social Democrats, the Finns Party was second. Revising to supported.",
+     "cites": ["ev1", "ev2"], "quotes": [], "tokens": 520, "usd": 0.0008, "cached": false, "refused": false}
+  ],
+  "agreement": [0.67, 1.0],
+  "verdict": "supported", "confidence": 0.9,
+  "rationale": "The certified 2023 results give the National Coalition 48 seats and the Finns Party 46, ahead of the Social Democrats' 43. All three agents agreed after the second round.",
+  "reasons": ["Official count: Finns Party 46 seats, second of all parties", "Only the National Coalition won more, with 48"],
+  "usd": 0.011, "usd_uncached": 0.011, "latency_s": 11.6, "error": null
+}

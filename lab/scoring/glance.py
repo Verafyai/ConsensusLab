@@ -12,6 +12,7 @@ import contextlib
 import re
 import threading
 from pathlib import Path
+from urllib.parse import urlsplit
 
 GLANCE_PROMPT = (
     "This image is a fact-check card. Look only at the image. Report what it says: the "
@@ -83,7 +84,9 @@ def render_card(transcript: dict, out_png: Path, variant: str | None = None,
     with ctx as base, sync_playwright() as pw:
         browser = pw.chromium.launch()
         page = browser.new_page(viewport={"width": size, "height": size})
-        page.route("**/__card_transcript.json", lambda route: route.fulfill(
+        # Match the path only: a glob would also match the page URL, whose query ends in it.
+        is_t = lambda u: urlsplit(u).path == "/__card_transcript.json"  # noqa: E731
+        page.route(is_t, lambda route: route.fulfill(
             status=200, content_type="application/json", body=json.dumps(transcript)))
         url = f"{base}/replay/index.html?mode=card&aspect=square&t=/__card_transcript.json"
         if variant:

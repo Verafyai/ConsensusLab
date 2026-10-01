@@ -122,9 +122,12 @@ def test_render_card_and_glance_live(tmp_path):
     pytest.importorskip("playwright")
     if not (paths.ROOT / "viz/replay/index.html").exists():
         pytest.skip("replay app not built")
+    from playwright.sync_api import sync_playwright
     try:
-        png = glance.render_card(SAMPLE, tmp_path / "card.png")
-    except Exception as e:  # noqa: BLE001
+        with sync_playwright() as pw:
+            pw.chromium.launch().close()
+    except Exception as e:  # noqa: BLE001 - only a missing browser is a skip
         pytest.skip(f"browser unavailable: {e}")
+    png = glance.render_card(SAMPLE, tmp_path / "card.png")
     assert png.exists() and png.stat().st_size > 10_000
     assert Path(png).read_bytes()[:4] == b"\x89PNG"

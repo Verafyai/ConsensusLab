@@ -1,0 +1,36 @@
+{
+  "experiment": "SAMPLE", "protocol": "evidence-first-3", "item": "q-sample-0000000003", "split": "dev",
+  "question": "Eating carrots improves your night vision.",
+  "label_set": ["supported", "refuted", "not_enough_evidence", "conflicting"],
+  "gold": "conflicting",
+  "evidence": [
+    {"id": "ev1", "url": "https://ods.od.nih.gov/factsheets/VitaminA-Consumer/", "title": "Vitamin A and Carotenoids: Fact Sheet for Consumers",
+     "published": "2023-01-14", "excerpt": "One of the first signs of vitamin A deficiency is night blindness, the inability to see in low light or darkness. Beta-carotene from foods such as carrots is converted into vitamin A.",
+     "stance": {"claude-sonnet": "supports", "grok-fast": "supports", "claude-haiku": "supports"}},
+    {"id": "ev2", "url": "https://www.smithsonianmag.com/arts-culture/a-wwii-propaganda-campaign-popularized-the-myth-that-carrots-help-you-see-in-the-dark-28812484/", "title": "A WWII Propaganda Campaign Popularized the Myth That Carrots Help You See in the Dark",
+     "published": "2013-08-13", "excerpt": "The British Air Ministry spread the story that its pilots ate carrots to explain their success at night, hiding the use of new airborne radar.",
+     "stance": {"claude-sonnet": "refutes", "grok-fast": "neutral", "claude-haiku": "refutes"}},
+    {"id": "ev3", "url": "https://www.aao.org/eye-health/tips-prevention/carrots-vision", "title": "Do carrots really improve your eyesight?",
+     "published": "2022-05-03", "excerpt": "If you already get enough vitamin A, eating more carrots will not sharpen your night vision. Extra beta-carotene simply isn't converted.",
+     "stance": {"claude-sonnet": "refutes", "grok-fast": "neutral", "claude-haiku": "neutral"}},
+    {"id": "ev4", "url": "https://academic.oup.com/jn/article/vitamin-a-dark-adaptation-nepal", "title": "Dark adaptation improves with vitamin A from foods in night-blind pregnant women",
+     "published": "2004-09-01", "excerpt": "Among night-blind pregnant women in Nepal, daily carrots restored dark adaptation as well as vitamin A capsules over six weeks.",
+     "stance": {"claude-sonnet": "supports", "grok-fast": "supports", "claude-haiku": "supports"}}
+  ],
+  "turns": [
+    {"n": 1, "round": 1, "agent": "grader-1", "model": "claude-sonnet", "family": "claude", "position": "conflicting", "belief": null,
+     "text": "ev1 and ev4 support a benefit, but only for people who lack vitamin A. ev2 and ev3 refute the general claim for well-fed people. The claim overgeneralises.",
+     "cites": ["ev1", "ev2", "ev3", "ev4"], "quotes": [], "tokens": 820, "usd": 0.0052, "cached": false, "refused": false},
+    {"n": 2, "round": 1, "agent": "grader-2", "model": "grok-fast", "family": "grok", "position": "supported", "belief": null,
+     "text": "ev1 and ev4 show carrots restore night vision. ev2 is about the origin of the story and ev3 adds a caveat; neither shows carrots don't help.",
+     "cites": ["ev1", "ev2", "ev3", "ev4"], "quotes": [], "tokens": 610, "usd": 0.0013, "cached": false, "refused": false},
+    {"n": 3, "round": 1, "agent": "grader-3", "model": "claude-haiku", "family": "claude", "position": "supported", "belief": null,
+     "text": "Two sources show a direct effect on night vision (ev1, ev4). ev2 says the wartime story was exaggerated. ev3 limits the effect to deficient diets.",
+     "cites": ["ev1", "ev2", "ev3", "ev4"], "quotes": [], "tokens": 590, "usd": 0.0009, "cached": false, "refused": false}
+  ],
+  "agreement": [0.67],
+  "verdict": "supported", "confidence": 0.58,
+  "rationale": "Stance count: two sources support the claim with all three graders agreeing; the refuting reads of ev2 and ev3 were split. Aggregated stance leans supported, with low confidence.",
+  "reasons": ["Vitamin A from carrots reverses night blindness (ev1, ev4)", "Refuting sources were graded inconsistently"],
+  "usd": 0.0074, "usd_uncached": 0.0074, "latency_s": 6.3, "error": null
+}
