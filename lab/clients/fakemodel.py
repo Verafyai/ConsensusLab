@@ -13,7 +13,7 @@ import re
 from lab.clients.base import Request
 
 EV_RE = re.compile(r"\[(ev\d+)\][^\n]*\n([^\n]+)")
-GOLD_RE = re.compile(r"__gold=(\w+)")
+CLAIM_RE = re.compile(r"^Claim: (.+)$", re.M)
 
 
 def _h(*parts: object) -> int:
@@ -35,7 +35,8 @@ class SchemaResponder:
         ids = [e for e, _ in evs]
         if "verdict" in props:
             labels = props["verdict"]["enum"]
-            gold = next((g for c, g in self.gold.items() if c in text), None)
+            m = CLAIM_RE.search(text)
+            gold = self.gold.get(m.group(1).strip()) if m else None
             p = self.accuracy.get(model_id, 0.5)
             if gold in labels and (seed % 1000) / 1000 < p:
                 v = gold
