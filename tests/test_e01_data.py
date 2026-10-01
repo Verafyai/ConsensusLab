@@ -149,3 +149,31 @@ def test_only_holdout_module_touches_holdout_path():
 
 def test_holdout_dir_is_outside_repo():
     assert not paths.holdout_dir().resolve().is_relative_to(paths.ROOT)
+
+
+def test_scifact_claim_level_labels():
+    from lab.data.ingest import scifact
+    items = list(scifact.ingest(RAW / "scifact" / "claims_dev.jsonl"))
+    assert [(i["gold"], i["mapping"]) for i in items] == [
+        ("supported", "exact"), ("conflicting", "manual"), ("not_enough_evidence", "exact")]
+    for it in items:
+        validate(it)
+
+
+def test_factors_mapping():
+    from lab.data.ingest import factors
+    items = list(factors.ingest(RAW / "factors" / "factors.csv"))
+    assert [(i["gold"], i["mapping"]) for i in items] == [("refuted", "exact"),
+                                                          ("conflicting", "lossy")]
+    assert items[0]["date"] == "2024-05-01"
+    for it in items:
+        validate(it)
+
+
+def test_datacommons_post_cutoff_and_manual_drop():
+    from lab.data.ingest import datacommons
+    items = list(datacommons.ingest(RAW / "datacommons" / "feed.json"))
+    assert len(items) == 1
+    it = validate(items[0])
+    assert it["gold"] == "refuted" and it["date"] == "2026-07-28"
+    assert splits.is_post_cutoff(it, "2026-06-30")

@@ -24,7 +24,8 @@ APPROVED = paths.DATA / "approved_sources.txt"
 DEV = paths.DATA / "questions" / "dev.jsonl"
 RAW = paths.DATA / "questions" / "raw"
 REPORT = paths.DATA / "SPLITS.md"
-INGESTERS = ["averitec", "liar", "fever", "claimreview", "panel"]
+INGESTERS = ["averitec", "liar", "fever", "claimreview", "panel", "scifact", "factors",
+             "datacommons"]
 
 
 def approved_sources(path: Path | None = None) -> list[str]:

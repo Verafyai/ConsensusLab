@@ -1,0 +1,4 @@
+{"dataFeedElement": [{"item": [
+ {"@type": "ClaimReview", "claimReviewed": "A new 2026 law bans gas stoves nationwide.", "url": "https://fc.example.org/stoves", "datePublished": "2026-08-02", "author": {"name": "Example Check"}, "reviewRating": {"alternateName": "False"}, "itemReviewed": {"datePublished": "2026-07-28", "author": {"name": "Facebook post"}}, "sdLicense": "https://creativecommons.org/licenses/by/4.0/"},
+ {"@type": "ClaimReview", "claimReviewed": "No evidence claim.", "url": "https://fc.example.org/ne", "reviewRating": {"alternateName": "No evidence"}}
+]}]}

@@ -77,6 +77,7 @@ consensus-lab/
     scoring/         accuracy.py  calibration.py  cost.py  readability.py  glance.py
                      human.py  poll.py  social.py  bootstrap.py
     orchestrator/    loop.py  promote.py  holdout.py  learnings.py
+  zones/             Z1..Z7/ {ZONE.md, knobs.yaml, sub/*.yaml, leaderboard.json}
   experiments/       E-0001/ {proposal.md, protocol.yaml, results.json, summary.md}
   runs/              <experiment>/<question>.json.gz (transcripts)
   learnings/         learnings.jsonl
@@ -203,7 +204,44 @@ The baseline library in §5.1 provides the remaining controls: the best single m
 - **Estimate before running.** The orchestrator prints configurations × items × estimated cost per item, and stops if the total exceeds the Season 0 budget in `budget.yaml`.
 - **Example to show the scale, not a quote:** 12 configurations × 100 screening items × about $0.05 per item is about $60. The holdout round for 6 configurations × 500 items is about $150 more. Caching makes later reruns free.
 
-### 5.4 Transcript schema
+### 5.4 Testing zones
+
+Techniques are organized into **testing zones**: one zone per family of consensus technique, each containing sub-techniques and the knobs that tune them. Each zone is a self-contained arena with its own control, budget, leaderboard and refinement loop. Zone champions then compete against each other in the **arena**.
+
+```
+zones/<zone>/
+  ZONE.md          what this family is, its papers, its control, its open questions
+  knobs.yaml       the parameters the experimenter may vary, with allowed ranges
+  sub/<sub>.yaml   one protocol template per sub-technique
+  leaderboard.json computed by the orchestrator
+```
+
+**The zones (seeded from the Research Library):**
+
+| Zone | Sub-techniques | Knobs | Papers | Control |
+|---|---|---|---|---|
+| **Z1 Single model** | Direct answer; answer with evidence; reasoning before answering | Model, evidence on or off, temperature | none | (this zone is the floor everyone must beat) |
+| **Z2 Sampling and ensembles** | Self-consistency; multi-model vote; confidence-weighted vote | Samples, models, vote rule | Smit 2024 | Best Z1 |
+| **Z3 Iterative revision** | Society of minds; revise after peer summary; revise after full transcripts | Agents, rounds, what agents see, agreement intensity | Du 2023, Smit 2024 | Z2 self-consistency at equal cost |
+| **Z4 Adversarial debate** | Fixed-side debate with judge; affirmative vs. negative with early stop | Rounds, judge model, early-stop rule, side assignment | Irving 2018, Liang 2023 | Z2 at equal cost |
+| **Z5 Information-asymmetric debate** | Judge without evidence; verified quotes; best-of-N persuasive debaters; weak judge | Judge strength, quote limits, N drafts, open vs. assigned roles | Michael 2023, Khan 2024, Kenton 2024 | Consultancy (single advocate) |
+| **Z6 Persona panels** | Diverse personas; communication modes (one by one, simultaneous, with summarizer) | Persona set, panel size, mode | Chan 2023 | Same panel with identical personas |
+| **Z7 Evidence-first aggregation** | Per-source stance grading; weighted stance aggregation; calibrated aggregator (optional Jev) | Sources, stance graders, aggregation rule | the lab's own | Best Z1 with evidence |
+
+The experimenter may propose a new sub-technique or a new zone. A new zone needs a ZONE.md naming its control, and Rex approves it before it gets a budget.
+
+**How a zone refines itself.** A zone refinement run hands the Claude experimenter one zone and N iterations. Within that run, it may change only that zone's knobs and sub-techniques, inside the ranges in `knobs.yaml`. Each iteration follows the normal cycle (§7.1) on the dev split. The zone's leaderboard tracks its best configuration, and its learnings are tagged with the zone, so lessons stay findable.
+
+**Fair comparison rules:**
+- Every zone always reports its result against its own control **and** against Z1's best.
+- Cross-zone comparisons are reported at **matched cost** as well as raw. A technique that wins only by spending 10× more is shown as such.
+- All zones in a comparison use the same items, models tier and evidence settings, unless the comparison is about exactly those.
+
+**The arena.** Once a week, or on demand from the dashboard, each zone's champion runs on the holdout. The overall champion is chosen by the promotion rule (§6.2), and the arena results feed the protocol leaderboard and the accuracy-vs-cost plot.
+
+**Holdout budget (prevents overfitting by repeated peeking).** Each time anyone tests on the holdout and acts on the result, the holdout becomes a little less hidden. The lab therefore allows a limited number of holdout evaluations per week (`budget.yaml: holdout_evals_per_week`, default 10). Zone refinement uses dev only, and the dashboard shows how many holdout evaluations remain. When the holdout has been used heavily, Rex can rotate in fresh post-cutoff items.
+
+### 5.5 Transcript schema
 
 Every run of a protocol on an item saves a transcript, the raw material for the visual:
 
@@ -417,7 +455,27 @@ Sortable by any column, with a filter for seed protocols vs. invented ones.
 
 **Budget.** Spend today, this week, this month and for Season 0, against the caps.
 
-### 8.3 Video
+### 8.3 Lab controls: run, refine, compare
+
+The local dashboard isn't only for watching; it's also how Rex runs the lab. The static GitHub Pages copy is read-only and has none of these controls.
+
+**Zones view.** A tile for each zone shows its best configuration, its accuracy against its control and against Z1, its cost per item, iterations run, and spend. Opening a zone shows its sub-techniques, its knobs with their current best values, its leaderboard, its learnings, and replays of its most interesting cases.
+
+**Run an experiment.** Pick a zone, a sub-technique and knob values (the form only offers values inside `knobs.yaml`), plus an item set: a 100-item screen or the full dev split. The dashboard shows the orchestrator's cost estimate before anything runs. Running requires a confirmation click, and the orchestrator refuses anything over cap. The run joins the queue, with live progress shown.
+
+**Refine a zone.** Pick a zone, a number of iterations and a budget, plus optional steering ("focus on the conflicting label"). This starts a zone refinement run (§5.4). Progress shows as a learning curve inside the zone, like the checkworthy dashboard.
+
+**Compare.** Select 2 to 4 configurations, from any zones. The comparison shows:
+- the metrics side by side, raw and at matched cost
+- the paired difference with its 95% CI, for each pair
+- per-label recall for each
+- the cases where they disagree, with replays side by side
+
+**Send to the arena.** Submit a configuration for a holdout evaluation. This uses one of the week's holdout evaluations, and the dashboard says so before you confirm.
+
+**Safety on controls.** Every control action is logged to the Record with who started it and what it cost. Controls can't change budget caps, the holdout, labels, scoring or the clearance policy.
+
+### 8.4 Video
 
 `viz/render_video.py` records the autoplay replay with a headless browser and encodes a 20–40 second H.264 MP4 with burned-in captions and no audio requirement, in a square or 16:9 format. Before posting, it validates the file against X's current media limits; E12 checks these limits rather than hardcoding them.
 
@@ -543,6 +601,14 @@ Deliverables:
   - The Season 0 estimate is printed and stays under the Season 0 cap.
 - **GATE:** Rex approves the Season 0 budget and the cards' faithfulness notes before the full run.
 
+**E04c · Testing zones**
+- **Deliverables:** the zone folders for Z1–Z7 (§5.4), each with ZONE.md, knobs.yaml and sub-technique templates mapped from the paper cards; zone refinement runs; zone leaderboards; the weekly arena; and the holdout evaluation budget.
+- **Acceptance:**
+  - Tests show a zone refinement run can't change knobs outside its zone or outside the allowed ranges.
+  - Tests show holdout evaluations stop when the weekly budget is used up.
+  - Each zone reports results against its control and against Z1, raw and at matched cost.
+  - One refinement run of 3 iterations completes in one zone.
+
 **E05 · Scoring**
 - **Deliverables:** accuracy, macro-F1, calibration, cost, the paired bootstrap, the leaderboard and the minimum-detectable-effect report.
 - **Acceptance:** each metric has unit tests against hand-computed fixtures; the bootstrap is deterministic given a seed.
@@ -561,9 +627,9 @@ Deliverables:
 - **Deliverables:** the replay view (§8.1), still card mode, autoplay and phone layout.
 - **Acceptance:** replays render from real transcripts; the still card shows the verdict, confidence and top reasons; no excerpt exceeds 40 words.
 
-**E09 · Performance dashboard**
-- **Deliverables:** every view in §8.2, including the replication scorecard, local thumbs ratings stored in `ratings.jsonl` and committed, and the static export.
-- **Acceptance:** all views render from real data; a thumbs click persists; the static export works with ratings hidden.
+**E09 · Performance dashboard and lab controls**
+- **Deliverables:** every view in §8.2 and every control in §8.3, including the replication scorecard, local thumbs ratings stored in `ratings.jsonl` and committed, and the static export.
+- **Acceptance:** all views render from real data; a thumbs click persists; a run started from the dashboard shows its estimate, needs confirmation and is refused over cap; a comparison of two configurations shows the paired CI; the static export works with ratings and controls hidden.
 
 **E10 · Readability and glanceability**
 - **Deliverables:** the scorers in §6.1.3, and a report of agreement with human ratings.
@@ -579,7 +645,7 @@ Deliverables:
 ### Phase 3: Social
 
 **E12 · Video**
-- **Deliverables:** the renderer in §8.3, and checks against X's current media limits.
+- **Deliverables:** the renderer in §8.4, and checks against X's current media limits.
 - **Acceptance:** produces a valid MP4 from a replay in under 2 minutes; the captions are legible on a phone.
 
 **E13 · Grok agent**
@@ -618,11 +684,12 @@ Deliverables:
 | E03 | Evidence retrieval | E02 | TODO | |
 | E04 | Protocol engine | E02, E03 | TODO | |
 | E04b | Library scan and Season 0 | E04 | TODO | |
+| E04c | Testing zones | E04b | TODO | |
 | E05 | Scoring | E01 | TODO | |
 | E06 | Orchestrator | E04, E05 | TODO | |
 | E07 | Experimenter | E06 | TODO | |
 | E08 | Evidence replay | E04 | TODO | |
-| E09 | Performance dashboard | E04b, E05, E08 | TODO | |
+| E09 | Performance dashboard and lab controls | E04c, E05, E08 | TODO | |
 | E10 | Readability and glanceability | E08 | TODO | |
 | E11 | herdr harness | E06 | TODO | |
 | E12 | Video | E08 | TODO | |

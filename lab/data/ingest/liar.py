@@ -42,6 +42,6 @@ def ingest(path: Path) -> Iterator[dict]:
                 expert_source=f"PolitiFact rating '{label}' (LIAR {sid.removesuffix('.json')})",
                 context="; ".join(x for x in [f"Speaker: {speaker}" if speaker else "",
                                               f"Venue: {ctx}" if ctx else ""] if x) or None,
-                source_label=label,
+                source_label=label, mapping="exact" if label in ("true", "false", "pants-fire") else "lossy",
                 flags=flags_for(statement, speaker, party, extra=["political"]),
             )

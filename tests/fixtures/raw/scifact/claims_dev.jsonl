@@ -1,0 +1,4 @@
+{"id": 1, "claim": "Vitamin D supplementation reduces fracture risk in elderly adults.", "evidence": {"11": [{"sentences": [1], "label": "SUPPORT"}]}, "cited_doc_ids": [11]}
+{"id": 2, "claim": "Aspirin increases tumor growth in mice.", "evidence": {"12": [{"sentences": [0], "label": "CONTRADICT"}], "13": [{"sentences": [2], "label": "SUPPORT"}]}, "cited_doc_ids": [12, 13]}
+{"id": 3, "claim": "Coffee intake has no effect on sleep.", "evidence": {}, "cited_doc_ids": [14]}
+{"id": 4, "claim": "Unlabeled test claim."}

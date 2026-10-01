@@ -10,11 +10,12 @@ Live build status (spec §12). A chunk is DONE only when every acceptance criter
 | E03 | Evidence retrieval | E02 | TODO | | |
 | E04 | Protocol engine | E02, E03 | TODO | | |
 | E04b | Library scan and Season 0 | E04 | TODO | | |
+| E04c | Testing zones | E04b | TODO | | |
 | E05 | Scoring | E01 | TODO | | |
 | E06 | Orchestrator | E04, E05 | TODO | | |
 | E07 | Experimenter | E06 | TODO | | |
 | E08 | Evidence replay | E04 | TODO | | |
-| E09 | Performance dashboard | E04b, E05, E08 | TODO | | |
+| E09 | Performance dashboard and lab controls | E04c, E05, E08 | TODO | | |
 | E10 | Readability and glanceability | E08 | TODO | | |
 | E11 | herdr harness | E06 | TODO | | |
 | E12 | Video | E08 | TODO | | |

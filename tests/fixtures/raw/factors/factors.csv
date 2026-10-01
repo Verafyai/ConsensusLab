@@ -1,0 +1,4 @@
+claim_id,claim,normalised_rating,original_verdict,url,date_published,organisation
+1,"Wind turbines cause cancer.",false,False,https://fc.example.org/1,2024-05-01,Example Check
+2,"Inflation hit 9 percent.",partially true,Half True,https://fc.example.org/2,2023-02-03,Example Check
+3,"Something odd.",other,Satire,https://fc.example.org/3,2023-02-03,Example Check

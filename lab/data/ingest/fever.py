@@ -31,6 +31,6 @@ def ingest(path: Path) -> Iterator[dict]:
             yield base_item(
                 SOURCE, str(row["id"]), row["claim"], gold, label_set=list(LABEL_SET),
                 expert_source="FEVER crowd annotators against Wikipedia (2017 snapshot)",
-                source_label=row["label"],
+                source_label=row["label"], mapping="exact",
                 flags=flags_for(row["claim"], extra=["crowd_labeled"]),
             )

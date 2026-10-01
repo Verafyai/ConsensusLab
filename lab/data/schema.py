@@ -33,6 +33,8 @@ ITEM_SCHEMA: dict[str, Any] = {
         "source": {"type": "string"},          # dataset key, e.g. "averitec"
         "source_label": {"type": ["string", "null"]},  # original label before mapping
         "source_url": {"type": ["string", "null"]},    # page that must be blocked from retrieval
+        "mapping": {"enum": ["exact", "lossy", "manual"]},  # how source_label became gold
+        "license": {"type": ["string", "null"]},
     },
 }
 

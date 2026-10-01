@@ -46,6 +46,7 @@ def ingest(path: Path) -> Iterator[dict]:
             context=f"Speaker: {speaker}" if speaker else None,
             date=_date(row.get("claim_date")),
             expert_rationale=(row.get("justification") or None),
+            mapping="exact",
             source_label=row.get("label"),
             source_url=row.get("fact_checking_article") or None,
             flags=flags_for(row["claim"], speaker),
