@@ -20,3 +20,5 @@ ops/events.jsonl
 library/pdfs/
 library/text/
 social/private/
+ops/heartbeat.lock
+ops/heartbeat.tmp

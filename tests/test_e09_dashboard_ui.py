@@ -187,7 +187,7 @@ OVERFLOW_JS = """() => {
   // elements wider than the viewport that aren't inside their own scroll container
   const W = window.innerWidth, bad = [];
   const scroller = (el) => { for (let p = el.parentElement; p; p = p.parentElement) {
-    const o = getComputedStyle(p).overflowX; if (o === 'auto' || o === 'scroll') return true; } return false; };  # noqa: E501
+    const o = getComputedStyle(p).overflowX; if (o === 'auto' || o === 'scroll') return true; } return false; };
   for (const el of document.querySelectorAll('section.view.active *, header *')) {
     const r = el.getBoundingClientRect();
     if (r.width && r.right > W + 1 && !scroller(el)) bad.push(el.tagName + '.' + el.className);
