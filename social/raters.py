@@ -183,7 +183,7 @@ class Registry:
             if not r.calibration:
                 by_case[r.case].append(r)
         found = set()
-        for case, rs in by_case.items():
+        for rs in by_case.values():
             new = []
             for r in rs:
                 rr = self.raters.get(r.rater)
