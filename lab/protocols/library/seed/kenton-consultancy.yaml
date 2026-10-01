@@ -1,0 +1,27 @@
+id: kenton-consultancy
+description: Control for kenton-weak-judge. One strong consultant (claude-sonnet) argues a randomly assigned
+  side for 3 rounds; the same weak judge (claude-haiku) sees only the consultant's arguments and verified
+  quotes, never the evidence.
+pattern: consultancy
+paper: 07-kenton-2024-weak-judges-strong-llms
+controls:
+- kenton-weak-judge
+- kenton-direct-weak
+tags:
+- season0
+- z5
+evidence:
+  retrieve: true
+  max_sources: 6
+  per_agent: shared
+  judge_sees: quotes
+agents:
+- role: consultant
+  model: claude-sonnet
+- role: judge
+  model: claude-haiku
+rounds: 3
+quotes:
+  verify: true
+  max_words: 30
+aggregation: judge

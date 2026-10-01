@@ -1,0 +1,36 @@
+id: kenton-weak-judge
+description: Strong mid-tier advocates (claude-sonnet affirm, grok-fast deny) see the retrieved evidence
+  and debate for 3 rounds; a cheap weak judge (claude-haiku) never sees the evidence, only the debate
+  plus quotes checked word for word against the sources (Kenton et al. 2024, extractive/information-asymmetric
+  setting).
+pattern: debate
+paper: 07-kenton-2024-weak-judges-strong-llms
+controls:
+- kenton-consultancy
+- kenton-direct-weak
+- single-claude-haiku
+- single-claude-sonnet
+tags:
+- season0
+- z5
+evidence:
+  retrieve: true
+  max_sources: 6
+  per_agent: shared
+  judge_sees: quotes
+agents:
+- role: advocate
+  side: affirm
+  model: claude-sonnet
+- role: advocate
+  side: deny
+  model: grok-fast
+- role: judge
+  model: claude-haiku
+rounds: 3
+best_of_n: 1
+quotes:
+  verify: true
+  max_words: 30
+aggregation: judge
+swap_sides: true

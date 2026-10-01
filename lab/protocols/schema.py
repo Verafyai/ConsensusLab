@@ -77,6 +77,12 @@ PROTOCOL_SCHEMA: dict[str, Any] = {
         # 1 = converge). Rendered into the revision prompt.
         "agreement_intensity": {"type": "number", "minimum": 0, "maximum": 1},
         "best_of_n": {"type": "integer", "minimum": 1, "maximum": 8},   # Khan et al.
+        # Debate: alternate which advocate argues which side per item, so model family and
+        # side aren't confounded.
+        "swap_sides": {"type": "boolean"},
+        "arg_words": {"type": "integer", "minimum": 20, "maximum": 400},
+        # Society: what revising agents see of their peers.
+        "peer_view": {"enum": ["verdict", "rationale", "full"]},
         "quotes": {"type": "object", "additionalProperties": False,
                    "properties": {"verify": {"type": "boolean"},
                                   "max_words": {"type": "integer", "minimum": 5}}},

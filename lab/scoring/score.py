@@ -5,6 +5,8 @@ from __future__ import annotations
 from lab.scoring import accuracy, calibration, cost
 from lab.scoring.bootstrap import paired_diff, verdict
 
+BINARY = ("supported", "refuted")
+
 
 def label_set(transcripts: list[dict]) -> list[str]:
     seen: list[str] = []
@@ -28,6 +30,14 @@ def score(transcripts: list[dict], ece_bins: int = 10) -> dict:
     out["ece"] = calibration.ece(gold, pred, conf, ece_bins)
     out["cost"] = cost.summarize(ts)
     out["rounds"] = max((x.get("round", 0) for t in ts for x in t["turns"]), default=0)
+    # Two-sided debate has an advocate only for supported/refuted; report that stratum too.
+    binary = [t for t in ts if t["gold"] in BINARY]
+    if binary and len(binary) < len(ts):
+        bg = [t["gold"] for t in binary]
+        out["binary"] = {"n": len(binary),
+                         "macro_f1": accuracy.macro_f1(bg, [t["verdict"] for t in binary],
+                                                       list(BINARY)),
+                         "accuracy": accuracy.accuracy(bg, [t["verdict"] for t in binary])}
     return out
 
 

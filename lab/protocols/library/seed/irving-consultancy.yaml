@@ -1,0 +1,11 @@
+id: irving-consultancy
+description: Control for irving-debate. One consultant argues a randomly assigned side for three rounds; the judge sees only the argument, never the evidence.
+pattern: consultancy
+paper: 01-irving-2018-ai-safety-via-debate
+tags: [season0, z4, control]
+evidence: {retrieve: true, max_sources: 6, per_agent: shared, judge_sees: none}
+agents:
+  - {role: consultant, model: claude-sonnet}
+  - {role: judge, model: claude-sonnet}
+rounds: 3
+aggregation: judge

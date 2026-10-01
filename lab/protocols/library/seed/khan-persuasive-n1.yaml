@@ -1,0 +1,34 @@
+id: khan-persuasive-n1
+description: Khan et al. 2024 weak-debater variant. Identical to khan-persuasive but best_of_n 1, so the
+  strength comparison (N=4 vs N=1) is within one protocol.
+pattern: debate
+paper: 06-khan-2024-persuasive-debaters-truthful
+controls:
+- khan-persuasive
+- khan-consultancy
+tags:
+- season0
+- z5
+evidence:
+  retrieve: true
+  max_sources: 6
+  per_agent: shared
+  judge_sees: quotes
+quotes:
+  verify: true
+  max_words: 30
+best_of_n: 1
+agents:
+- role: advocate
+  side: affirm
+  model: claude-sonnet
+- role: advocate
+  side: deny
+  model: grok-fast
+- role: judge
+  model: claude-sonnet
+rounds: 3
+aggregation: judge
+budget:
+  max_usd_per_item: 0.2
+swap_sides: true

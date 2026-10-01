@@ -1,0 +1,34 @@
+id: liang-mad-agree-high
+description: liang-mad with agreement intensity 0.9 (Smit et al. 2024 knob).
+pattern: debate
+paper: 08-smit-2024-should-we-be-going-mad
+controls:
+- liang-mad
+- smit-self-consistency
+tags:
+- season0
+- z4
+evidence:
+  retrieve: true
+  max_sources: 6
+  per_agent: shared
+  judge_sees: full
+agents:
+- role: advocate
+  side: affirm
+  model: claude-sonnet
+  name: affirmative
+- role: advocate
+  side: deny
+  model: grok-fast
+  name: negative
+- role: judge
+  model: claude-sonnet
+  name: moderator
+rounds: 3
+early_stop:
+  judge_can_end: true
+  min_rounds: 1
+aggregation: judge
+swap_sides: true
+agreement_intensity: 0.9

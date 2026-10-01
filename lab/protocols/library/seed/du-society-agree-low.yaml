@@ -1,0 +1,31 @@
+id: du-society-agree-low
+description: du-society with low agreement intensity (0.1, rendered as keep your own view unless given
+  a decisive reason). Smit et al. found low agreement helps only on counter-intuitive tasks (CIAR).
+pattern: society
+paper: 08-smit-2024-should-we-be-going-mad
+controls:
+- smit-self-consistency
+- smit-ensemble
+- du-society
+- single-claude-sonnet
+tags:
+- season0
+- z3
+evidence:
+  retrieve: true
+  max_sources: 6
+  per_agent: shared
+agents:
+- role: answerer
+  model: claude-sonnet
+  name: agent-1
+- role: answerer
+  model: claude-sonnet
+  name: agent-2
+- role: answerer
+  model: claude-sonnet
+  name: agent-3
+rounds: 2
+communication: simultaneous
+agreement_intensity: 0.1
+aggregation: majority

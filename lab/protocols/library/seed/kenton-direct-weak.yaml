@@ -1,0 +1,20 @@
+id: kenton-direct-weak
+description: Kenton's QA-without-article baseline. The weak judge (claude-haiku) answers the claim directly
+  from its own knowledge, with no retrieval and no help from a stronger model.
+pattern: single
+paper: 07-kenton-2024-weak-judges-strong-llms
+controls:
+- kenton-weak-judge
+- single-claude-haiku
+- single-claude-sonnet
+tags:
+- season0
+- z5
+evidence:
+  retrieve: false
+agents:
+- role: answerer
+  model: claude-haiku
+aggregation: majority
+output:
+  rationale_words: 60

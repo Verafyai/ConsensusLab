@@ -1,0 +1,19 @@
+id: smit-self-consistency
+description: Smit et al. control. One model (claude-sonnet) sampled 9 times on the same retrieved evidence,
+  matching du-society's call count (3 agents x 3 answer rounds); majority vote; confidence = agreement.
+pattern: sample_vote
+paper: 08-smit-2024-should-we-be-going-mad
+controls:
+- single-claude-sonnet
+tags:
+- season0
+- z3
+evidence:
+  retrieve: true
+  max_sources: 6
+  per_agent: shared
+agents:
+- role: answerer
+  model: claude-sonnet
+  samples: 9
+aggregation: majority

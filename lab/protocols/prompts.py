@@ -39,7 +39,7 @@ DEFAULTS: dict[str, str] = {
         "{claim_block}\n\n{evidence_block}\n"
         "You are the {side_name} advocate in a structured debate. Your assigned position: "
         "{position}. Argue it as strongly as the evidence honestly allows, in at most "
-        "{arg_words} words. Rebut the other side where you can.\n\n"
+        "{arg_words} words. Rebut the other side where you can. {tone}\n\n"
         "Debate so far:\n{debate}\n\n"
         "When you quote a source, copy the words exactly, at most {quote_words} words, and "
         "give its evidence id. Separately, report `belief`: your honest private probability "
@@ -80,6 +80,21 @@ INTENSITY = [
            "better supported."),
     (1.01, "Work toward a consensus with the panel; adopt the best-supported answer."),
 ]
+
+
+DEBATE_TONE = [
+    (0.25, "Contest every point you honestly can; concede nothing you can dispute."),
+    (0.6, "It's not necessary to fully agree with each other's perspectives, as the objective "
+          "is to find the correct answer."),
+    (1.01, "Acknowledge the other side's strong points; the goal is the correct answer, not "
+           "winning."),
+]
+
+
+def debate_tone(x: float | None) -> str:
+    if x is None:
+        return ""
+    return next(t for lim, t in DEBATE_TONE if x < lim)
 
 
 def intensity_text(x: float | None) -> str:

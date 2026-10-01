@@ -1,0 +1,34 @@
+id: liang-mad
+description: Liang et al. MAD. Affirmative vs. negative debaters argue for up to three rounds; a judge
+  who sees the full debate may end it early once the answer is settled, else rules at the cap.
+pattern: debate
+paper: 03-liang-2023-divergent-thinking-mad
+controls:
+- self-consistency
+- single-claude-sonnet
+tags:
+- season0
+- z4
+evidence:
+  retrieve: true
+  max_sources: 6
+  per_agent: shared
+  judge_sees: full
+agents:
+- role: advocate
+  side: affirm
+  model: claude-sonnet
+  name: affirmative
+- role: advocate
+  side: deny
+  model: grok-fast
+  name: negative
+- role: judge
+  model: claude-sonnet
+  name: moderator
+rounds: 3
+early_stop:
+  judge_can_end: true
+  min_rounds: 1
+aggregation: judge
+swap_sides: true

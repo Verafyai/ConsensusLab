@@ -1,0 +1,30 @@
+id: khan-consultancy
+description: Khan et al. 2024 control. One consultant argues a randomly assigned side with best-of-4 drafts
+  chosen by the judge model; the judge sees only the consultant's arguments plus verified/unverified quotes.
+  Paper predicts accuracy falls as N rises.
+pattern: consultancy
+paper: 06-khan-2024-persuasive-debaters-truthful
+controls:
+- khan-persuasive
+- michael-consultancy
+tags:
+- season0
+- z5
+evidence:
+  retrieve: true
+  max_sources: 6
+  per_agent: shared
+  judge_sees: quotes
+quotes:
+  verify: true
+  max_words: 30
+best_of_n: 4
+agents:
+- role: consultant
+  model: claude-sonnet
+- role: judge
+  model: claude-sonnet
+rounds: 3
+aggregation: judge
+budget:
+  max_usd_per_item: 0.4

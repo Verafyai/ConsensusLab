@@ -1,0 +1,26 @@
+id: smit-ensemble
+description: Smit et al. control (cheap non-debate ensembling). Three models from two families answer
+  independently on the same evidence; simple majority vote.
+pattern: panel
+paper: 08-smit-2024-should-we-be-going-mad
+controls:
+- single-claude-sonnet
+- smit-self-consistency
+tags:
+- season0
+- z3
+evidence:
+  retrieve: true
+  max_sources: 6
+  per_agent: shared
+agents:
+- role: answerer
+  model: claude-sonnet
+  name: sonnet
+- role: answerer
+  model: grok-fast
+  name: grok
+- role: answerer
+  model: claude-haiku
+  name: haiku
+aggregation: majority

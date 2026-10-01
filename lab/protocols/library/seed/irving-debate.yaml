@@ -1,0 +1,30 @@
+id: irving-debate
+description: Two advocates with fixed opposite sides argue for three rounds over retrieved evidence; the
+  judge sees only the debate transcript, never the evidence (Irving et al. 2018).
+pattern: debate
+paper: 01-irving-2018-ai-safety-via-debate
+controls:
+- irving-consultancy
+- single-claude-sonnet-closed
+tags:
+- season0
+- z4
+evidence:
+  retrieve: true
+  max_sources: 6
+  per_agent: shared
+  judge_sees: none
+agents:
+- role: advocate
+  side: affirm
+  model: claude-sonnet
+- role: advocate
+  side: deny
+  model: grok-fast
+- role: judge
+  model: claude-sonnet
+rounds: 3
+aggregation: judge
+early_stop:
+  judge_can_end: false
+swap_sides: true

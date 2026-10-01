@@ -172,7 +172,9 @@ class Engine:
         base = {"claim_block": self.claim_block(run.item),
                 "evidence_block": self.evidence_block(run.evidence),
                 "labels": P.labels_text(run.label_set),
-                "rationale_words": run.rationale_words, "arg_words": ARG_WORDS,
+                "rationale_words": run.rationale_words,
+                "arg_words": run.protocol.get("arg_words", ARG_WORDS),
+                "tone": P.debate_tone(run.protocol.get("agreement_intensity")),
                 "quote_words": run.protocol.get("quotes", {}).get("max_words", 30)}
         base.update(kw)
         return tmpl.format(**base)
@@ -190,6 +192,8 @@ class Engine:
         if record:
             d = resp.data if isinstance(resp.data, dict) else {}
             body = d.get("argument") or d.get("rationale") or d.get("summary") or ""
+            if d.get("argument"):
+                body = _words(body, run.protocol.get("arg_words", ARG_WORDS))
             if not body and d.get("grades"):
                 body = "; ".join(f"{g['ev']} {g['stance']}" for g in d["grades"])
             run.turns.append({
@@ -310,7 +314,7 @@ class Engine:
             new = []
             for i, a in enumerate(agents):
                 peers = summary or "\n".join(
-                    f"- {names[j]}: {v.verdict} ({v.confidence:.2f}). {v.data.get('rationale', '')}"
+                    self._peer_line(names[j], v, p.get("peer_view", "rationale"))
                     for j, v in enumerate(votes) if j != i)
                 own = f"{votes[i].verdict} ({votes[i].confidence:.2f}). " \
                       f"{votes[i].data.get('rationale', '')}"
@@ -323,6 +327,19 @@ class Engine:
         verdict, conf = self.aggregate(run, votes, rule)
         rat, reasons = self.best_rationale(votes, verdict)
         return verdict, conf, rat, reasons
+
+    @staticmethod
+    def _peer_line(name: str, v: Vote, view: str) -> str:
+        line = f"- {name}: {v.verdict} ({v.confidence:.2f})."
+        if view in ("rationale", "full"):
+            line += f" {v.data.get('rationale', '')}"
+        if view == "full":
+            reasons = "; ".join(v.data.get("reasons", []))
+            stances = ", ".join(f"{s.get('ev')} {s.get('stance')}"
+                                for s in v.data.get("stances", []) if isinstance(s, dict))
+            line += f" Reasons: {reasons}. Cited: {', '.join(v.data.get('cites', []))}." \
+                    f" Evidence reading: {stances}."
+        return line
 
     def _summarize(self, run: Run, agent: dict, votes: list[Vote], rnd: int) -> str:
         summ = next((a for a in run.protocol["agents"] if a["role"] == "summarizer"), agent)
@@ -395,7 +412,8 @@ class Engine:
             run.turns.append({
                 "n": len(run.turns) + 1, "round": rnd, "agent": name, "model": agent["model"],
                 "family": _family(self.gw.cfg, agent["model"]),
-                "text": d.get("argument", ""), "position": agent.get("side"),
+                "text": _words(d.get("argument", ""), run.protocol.get("arg_words", ARG_WORDS)),
+                "position": agent.get("side"),
                 "belief": _clamp01(d.get("belief")) if "belief" in d else None,
                 "cites": d.get("cites", []), "quotes": d.get("quotes", []),
                 "tokens": sum(x.tokens for x in drafts) + sel.tokens,
@@ -420,6 +438,9 @@ class Engine:
         p = run.protocol
         judge = next(a for a in p["agents"] if a["role"] == "judge")
         advs = [a for a in p["agents"] if a["role"] == "advocate"]
+        if p.get("swap_sides") and _seed_int(run.item["id"], "swap") % 2:
+            flip = {"affirm": "deny", "deny": "affirm"}
+            advs = [dict(a, side=flip[a["side"]]) for a in advs]
         rounds = max(1, p.get("rounds", 2))
         es = p.get("early_stop", {})
         for r in range(1, rounds + 1):

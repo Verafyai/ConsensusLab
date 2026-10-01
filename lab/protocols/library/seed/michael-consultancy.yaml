@@ -1,0 +1,28 @@
+id: michael-consultancy
+description: Michael et al. 2023 control. One consultant reads the evidence and argues a randomly assigned
+  side (affirm or deny); the judge sees only the consultant's arguments plus verified/unverified quotes,
+  never the evidence itself.
+pattern: consultancy
+paper: 05-michael-2023-debate-supervise-unreliable-experts
+controls:
+- michael-asymmetric
+tags:
+- season0
+- z5
+evidence:
+  retrieve: true
+  max_sources: 6
+  per_agent: shared
+  judge_sees: quotes
+quotes:
+  verify: true
+  max_words: 40
+agents:
+- role: consultant
+  model: claude-sonnet
+- role: judge
+  model: claude-sonnet
+rounds: 3
+aggregation: judge
+budget:
+  max_usd_per_item: 0.15

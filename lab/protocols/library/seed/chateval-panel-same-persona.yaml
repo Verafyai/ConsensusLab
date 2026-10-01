@@ -1,0 +1,31 @@
+id: chateval-panel-same-persona
+description: ChatEval control. Same three-judge one-by-one panel and rounds as chateval-panel, but every
+  judge gets the identical generic annotator role.
+pattern: chateval
+paper: 04-chan-2023-chateval
+controls:
+- chateval-panel
+tags:
+- season0
+- z6
+- control
+evidence:
+  retrieve: true
+  max_sources: 6
+  per_agent: shared
+agents:
+- role: judge
+  model: claude-sonnet
+  name: annotator-1
+  persona: You are now an Annotator, one of the referees in the fact-checking task.
+- role: judge
+  model: claude-sonnet
+  name: annotator-2
+  persona: You are now an Annotator, one of the referees in the fact-checking task.
+- role: judge
+  model: claude-sonnet
+  name: annotator-3
+  persona: You are now an Annotator, one of the referees in the fact-checking task.
+rounds: 2
+communication: one_by_one
+aggregation: majority

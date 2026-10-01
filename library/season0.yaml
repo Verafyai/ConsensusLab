@@ -1,0 +1,58 @@
+# Season 0 (spec §5.3): reproduce the eight library papers in fact-checking.
+# Each test compares `protocol` against `control` on the same items; `expect` is the
+# direction the paper's finding predicts. Code decides the verdict (lab/season0.py).
+sesoi: 0.02            # smallest effect of interest in macro-F1; below this counts as no effect
+screening_items: 100   # dev items every configuration runs on
+screening_seed: 0
+finalists: 4           # top configurations by dev macro-F1 that go to the holdout
+tests:
+  - paper: 01-irving-2018-ai-safety-via-debate
+    claim: A judge reaches the truth from adversarial argument alone.
+    protocol: irving-debate
+    control: single-claude-sonnet-closed     # the same judge model answering alone, no evidence
+    expect: better
+  - paper: 02-du-2023-multiagent-debate
+    claim: Revising after reading peers beats answering alone.
+    protocol: du-society
+    control: smit-self-consistency            # 9 samples, matched to du-society's 9 calls
+    expect: better
+  - paper: 03-liang-2023-divergent-thinking-mad
+    claim: Forced disagreement avoids getting stuck on a first answer.
+    protocol: liang-mad
+    control: self-consistency
+    expect: better
+  - paper: 04-chan-2023-chateval
+    claim: Diverse roles beat identical judges.
+    protocol: chateval-panel
+    control: chateval-panel-same-persona
+    expect: better
+  - paper: 05-michael-2023-debate-supervise-unreliable-experts
+    claim: Debate beats consultancy when the judge can't see the evidence.
+    protocol: michael-asymmetric
+    control: michael-consultancy
+    expect: better
+  - paper: 06-khan-2024-persuasive-debaters-truthful
+    claim: Stronger debaters make judges more accurate, not less.
+    protocol: khan-persuasive
+    control: khan-persuasive-n1
+    expect: better
+  - paper: 07-kenton-2024-weak-judges-strong-llms
+    claim: Debate lets a cheap judge reach strong-model accuracy.
+    protocol: kenton-weak-judge
+    control: kenton-direct-weak
+    expect: better
+    also:                                      # secondary: does it reach the strong model?
+      - {control: single-claude-sonnet, expect: not_worse}
+  - paper: 08-smit-2024-should-we-be-going-mad
+    claim: Debate doesn't beat cheap baselines unless agreement is tuned.
+    protocol: du-society
+    control: smit-self-consistency
+    expect: no_effect
+    also:
+      - {protocol: du-society-agree-high, control: smit-self-consistency, expect: better}
+      - {protocol: liang-mad-agree-high, control: liang-mad, expect: better}
+# Configurations screened besides those named above.
+extra_configs: [single-claude-sonnet, single-claude-haiku, evidence-first, panel-vote,
+                chateval-panel-simultaneous, chateval-panel-summarizer, khan-consultancy,
+                kenton-consultancy, irving-consultancy, du-society-agree-low,
+                liang-mad-agree-low, smit-ensemble]
