@@ -212,6 +212,8 @@ class Collector:
         if self.registry is not None:
             self.registry.detect_bursts()
             self.registry.save()
+            (paths.SOCIAL / "raters_summary.json").write_text(
+                json.dumps(self.registry.public_summary()))
         return out
 
     def _meter_read(self, scope) -> None:

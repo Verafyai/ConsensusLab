@@ -20,6 +20,36 @@ uv run python -m lab check   # refuses to run until budget and prices are set
 uv run pytest -q
 ```
 
+## Running it
+
+```bash
+harness/launch.sh                       # the herdr workspace: orchestrator, claude, grok, dashboard, monitor
+uv run python -m viz.dashboard.server   # dashboard only: http://127.0.0.1:8770
+uv run python -m lab.orchestrator.loop --once        # one experiment cycle
+uv run python -m lab.zones refine Z4 --iterations 3 --budget 10
+uv run python -m lab.season0 plan       # Season 0 cost estimate vs its cap
+uv run python -m lab.reports daily      # today's digest → ops/reports/
+uv run python -m social.agent --dry-run --force case_post
+uv run python -m viz.dashboard.demo /tmp/cl-demo     # offline demo data (no spend)
+```
+
+| Piece | Where |
+|---|---|
+| Data, splits, holdout (outside the repo) | `lab/data/`, `lab/orchestrator/holdout.py`, `data/SOURCES.md` |
+| Model gateway: cache, metering, caps | `lab/clients/` |
+| Evidence with the leakage guard | `lab/evidence/` |
+| Protocol engine and library | `lab/protocols/`, `lab/protocols/library/` (seed protocols in `seed/`) |
+| Season 0 paper cards (page refs verified) | `library/cards/`, `library/season0.yaml`, `lab/season0.py` |
+| Testing zones Z1–Z7 | `zones/`, `lab/zones.py` |
+| Scoring (Track A and B) | `lab/scoring/`, `lab/trackb.py` |
+| Orchestrator, learnings, jobs | `lab/orchestrator/` |
+| Experimenter (headless Claude Code, sandboxed) | `lab/experimenter/`, `harness/experimenter-settings.json` |
+| Replay, dashboard, video | `viz/replay/`, `viz/dashboard/`, `viz/render_video.py` |
+| @VerafyAI agent, collector, raters | `social/` |
+| Harness, monitor, Return To Office feed | `harness/` |
+
+Nothing paid runs until Rex closes the gates in `ops/queue/` (budget, prices, sources, keys).
+
 ## Two tracks, never blended
 
 | Track A: Consensus | Track B: Presentation |

@@ -66,6 +66,13 @@ def run_job(orch, job: dict) -> dict:
     from lab import zones
     update(job, state="running", started=datetime.now(UTC).isoformat(timespec="seconds"))
     saved = orch.experimenter
+    last = [0.0]
+
+    def progress(stage: str, done: int, total: int) -> None:
+        if time.time() - last[0] > 2 or done == total:      # throttle file writes
+            last[0] = time.time()
+            update(job, progress=f"{stage} {done}/{total}")
+    orch.on_progress = progress
     try:
         p = job["params"]
         if job["type"] == "run":
@@ -101,4 +108,5 @@ def run_job(orch, job: dict) -> dict:
         record(f"job.{job['type']}.failed", job["by"], job=job["id"], error=str(e)[:200])
     finally:
         orch.experimenter = saved
+        orch.on_progress = None
     return job

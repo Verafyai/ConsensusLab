@@ -1,0 +1,27 @@
+# Publishes the read-only dashboard to GitHub Pages (spec §8.2). Manual until Rex approves
+# publishing (data/SOURCES.md decision 12 governs whether case replays are included).
+name: pages
+on:
+  workflow_dispatch:
+    inputs:
+      with_cases:
+        description: "Publish dev case replays (needs source licenses cleared)"
+        type: boolean
+        default: false
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: {name: github-pages, url: "${{ steps.d.outputs.page_url }}"}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+      - run: uv sync
+      - run: uv run python -m viz.dashboard.export site ${{ inputs.with_cases && '--with-cases' || '' }}
+      - uses: actions/upload-pages-artifact@v3
+        with: {path: site}
+      - id: d
+        uses: actions/deploy-pages@v4

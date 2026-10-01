@@ -289,3 +289,38 @@ def test_browser_static_export_is_read_only(demo, browser, tmp_path):
         page.close()
     finally:
         httpd.shutdown()
+
+
+def test_dashboard_job_runs_with_progress(filled_config, tmp_path, monkeypatch):
+    from lab import zones
+    from lab.orchestrator import jobs
+    from tests.test_e06_orchestrator import make
+    import shutil
+    import subprocess
+    root = tmp_path / "jobroot"
+    for d in ("experiments", "learnings", "ops/queue"):
+        (root / d).mkdir(parents=True)
+    (root / "learnings" / "learnings.jsonl").write_text("")
+    shutil.copytree(zones.ZONES, root / "zones")
+    subprocess.run(["git", "init", "-q"], cwd=root, check=True)
+    subprocess.run(["git", "-c", "user.email=t@t", "-c", "user.name=t", "add", "-A"], cwd=root,
+                   check=True)
+    subprocess.run(["git", "-c", "user.email=t@t", "-c", "user.name=t", "commit", "-qm", "i"],
+                   cwd=root, check=True)
+    from lab import paths
+    for name, rel in [("ROOT", ""), ("EXPERIMENTS", "experiments"), ("LEARNINGS", "learnings"),
+                      ("OPS", "ops"), ("QUEUE", "ops/queue"), ("STOP", "ops/STOP"),
+                      ("EVENTS", "ops/events.jsonl"), ("HEARTBEAT", "ops/heartbeat.json"),
+                      ("RUNS", "runs")]:
+        monkeypatch.setattr(paths, name, root / rel if rel else root)
+    monkeypatch.setattr(zones, "ZONES", root / "zones")
+    monkeypatch.setenv("CL_HOLDOUT_DIR", str(tmp_path / "hold"))
+    orch, _ = make(filled_config, tmp_path, root, [])
+    p = zones.apply_knobs("Z1", "with-evidence", {"model": "claude-haiku"})
+    assert not p["id"].endswith("-")
+    job = jobs.enqueue("run", {"protocol": p, "n": 12, "zone": "Z1"}, "test", 0.1)
+    done = jobs.run_job(orch, job)
+    assert done["state"] == "done" and done["results"][0]["status"] == "dev_only"
+    assert done["progress"] == "dev 12/12"
+    rec = (root / "ops" / "record.jsonl").read_text()
+    assert "job.run.queued" in rec and "job.run.done" in rec

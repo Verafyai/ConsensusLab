@@ -69,6 +69,7 @@ class Orchestrator:
     resamples: int | None = None
     commit: bool = False                     # git-commit outputs at the end of each cycle
     constraint: dict | None = None           # zone refinement run (lab.zones.refine)
+    on_progress: object = None               # callable(stage, done, total), e.g. a job
     log: list[str] = field(default_factory=list)
     _zone_snapshot: object = None
 
@@ -235,6 +236,11 @@ class Orchestrator:
         (self.exp_root / "hitrate.json").write_text(json.dumps(
             learnings.hit_rate(self.results()), indent=1))
         self.emit("cycle.end", experiment=exp_id, status=result["status"], learning=entry["id"])
+        try:
+            from harness import rto
+            rto.sync()                       # Return To Office feed (E11b)
+        except Exception as e:  # noqa: BLE001 - the optional feed must never stop a cycle
+            self.log.append(f"rto sync failed: {e}")
         if self.commit:
             self._git_commit(f"{exp_id}: {result['protocol']} → {result['status']}")
         return result
@@ -311,7 +317,8 @@ class Orchestrator:
         self.heartbeat("dev", experiment=exp_id, protocol=protocol["id"])
         try:
             dev_ts = run_protocol(self.engine, protocol, dev, scope, exp_id, self.workers,
-                                  runs_root=self.root / "runs")
+                                  runs_root=self.root / "runs",
+                                  progress=self._progress("dev", exp_id))
             dev_score = score(dev_ts)
             base["dev"] = dev_score
             # Champion on the same items (cached when it has run them before).
@@ -414,6 +421,14 @@ class Orchestrator:
         elif now - last > timedelta(days=7):
             self.emit("learnings.consolidated", **learnings.consolidate())
             stamp.write_text(now.isoformat())
+
+    def _progress(self, stage: str, exp_id: str):
+        def cb(done: int, total: int) -> None:
+            if getattr(self, "pulse", None) is not None:
+                self.pulse.extra = {"experiment": exp_id, "progress": f"{done}/{total}"}
+            if callable(self.on_progress):
+                self.on_progress(stage, done, total)
+        return cb
 
     def _resamples(self) -> int:
         return self.resamples or self.cfg.scoring["promotion"]["bootstrap_resamples"]

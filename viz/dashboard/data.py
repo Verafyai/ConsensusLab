@@ -74,7 +74,22 @@ def spend_summary(cfg=None, now: datetime | None = None) -> dict:
             "series": series, "source": "ops/spend.jsonl"}
 
 
+def trackb_by_experiment() -> dict[str, dict]:
+    """Mean readability and glanceability per experiment, default variant (Track B)."""
+    from lab.trackb import default_variant
+    rows = _jsonl(paths.EXPERIMENTS / "trackb" / "scores.jsonl")
+    v = default_variant()
+    acc: dict[str, list[dict]] = defaultdict(list)
+    for r in rows:
+        if r.get("variant") == v:
+            acc[r["experiment"]].append(r)
+    return {e: {"readability": sum(x["readability"] for x in rs) / len(rs),
+                "glanceability": sum(x["glance"] for x in rs) / len(rs)}
+            for e, rs in acc.items()}
+
+
 def experiments_view(results: list[dict]) -> list[dict]:
+    tb = trackb_by_experiment()
     out = []
     for r in sorted(results, key=lambda r: r["experiment"]):
         d = paths.EXPERIMENTS / r["experiment"]
@@ -93,6 +108,8 @@ def experiments_view(results: list[dict]) -> list[dict]:
             "usd_per_item": (dev.get("cost") or {}).get("usd_per_item_uncached"),
             "usd_total": (dev.get("cost") or {}).get("usd_total"),
             "vs_champion": r.get("vs_champion"), "cases": r.get("cases", []),
+            "readability": (tb.get(r["experiment"]) or {}).get("readability"),
+            "glanceability": (tb.get(r["experiment"]) or {}).get("glanceability"),
             "source": f"experiments/{r['experiment']}/results.json"})
     return out
 
@@ -185,12 +202,17 @@ def social_view() -> dict:
     by_post: dict[str, dict] = {}
     for s in scores:
         by_post.setdefault(s["post_id"], {}).update(s)
+    raters = _json(paths.SOCIAL / "raters_summary.json", {}) or {}
+    if "reliability_histogram" in raters:     # anonymous distribution only
+        raters = {"n": raters.get("eligible_raters"),
+                  "histogram": [{"bin": f"{i / 10:.1f}–{(i + 1) / 10:.1f}", "count": c}
+                                for i, c in enumerate(raters["reliability_histogram"])]}
     themes: dict[str, int] = defaultdict(int)
     for f in fb:
         themes[f.get("category", "other")] += 1
     return {"posts": [{**p, "scores": by_post.get(p.get("post_id"), {})} for p in posts],
             "feedback_themes": dict(themes), "n_feedback": len(fb),
-            "raters": _json(paths.SOCIAL / "raters_summary.json", {})}
+            "raters": raters}
 
 
 def zones_view() -> list[dict]:
@@ -225,6 +247,13 @@ def headline(lb: dict, results: list[dict], spend: dict) -> str:
     return s + f", ${total:.2f} spent to get here."
 
 
+def _dev_items() -> int | None:
+    from lab.data.build import DEV
+    if not DEV.exists():
+        return None
+    return sum(1 for line in DEV.read_text().splitlines() if line.strip())
+
+
 def snapshot(local: bool = True) -> dict:
     from lab.config import get
     results = leaderboard.load_results()
@@ -253,6 +282,7 @@ def snapshot(local: bool = True) -> dict:
         "zones": zones_view(), "disagreement": disagreement(results),
         "cases": cases_view(results), "social": social_view(), "spend": spend,
         "holdout_evals_left": holdout_left,
+        "dev_items": _dev_items(),
     }
     if local:
         snap["ratings"] = ratings_view()
