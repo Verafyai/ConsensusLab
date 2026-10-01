@@ -1,0 +1,22 @@
+# Clearance policy for @VerafyAI (spec §9.2), enforced in code by social/policy.py.
+# Locked path: agents can't edit it. Rex changes it by hand. Anything not cleared here goes
+# to ops/queue/ for approval.
+cleared:
+  case_post:     {max_per_day: 1}          # video replay + caption + poll (+ poll reply)
+  lab_update:    {max_per_week: 1}         # champion, accuracy, cost, top lesson
+  ack_reply:     {max_per_day: 20, max_chars: 200}   # only in the lab's own threads
+never_without_approval:
+  flags: [political, named_person]         # excluded from automatic case selection
+  actions: [reply_outside_own_thread, mention, quote, dm, follow, like]
+  uncommitted_claims: true                 # every post needs a committed result file
+  verdict_dispute_responses: true          # disputes become review items instead
+always:
+  disclosure: "Produced by an AI panel"    # must appear in every post
+  evidence_link: true                      # every post links to the full evidence
+  min_seconds_between_posts: 300
+  max_posts_per_day: 4                     # hard cap across all kinds (case + poll reply + acks)
+  max_chars: 280
+dashboard_base_url: "https://verafyai.github.io/ConsensusLab"   # public static export
+poll:
+  options: ["Yes, and convincing", "Right, but weak evidence", "Wrong verdict", "Can't tell"]
+  duration_minutes: 1440

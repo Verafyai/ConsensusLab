@@ -1,0 +1,29 @@
+# X video upload limits, checked 2026-10-01 against
+# https://docs.x.com/x-api/media/quickstart/best-practices (E12: verified, not assumed).
+# Re-check when uploads start failing; viz/render_video.py validates every file against this.
+checked: 2026-10-01
+source: https://docs.x.com/x-api/media/quickstart/best-practices
+video:
+  codec: h264
+  profile_recommended: High
+  max_fps: 60
+  min_width: 32
+  min_height: 32
+  max_width: 1280
+  max_height: 1024           # a 1080x1080 square is NOT allowed; we render 720x720
+  min_duration_s: 0.5
+  max_duration_s: 1200        # default accounts: 20 minutes
+  max_bytes: 8000000000       # default accounts: 8 GB
+  aspect_min: 0.3333
+  aspect_max: 3.0
+  pix_fmt: yuv420p
+  min_video_kbps: 5000        # recommended minimum
+  audio_codec: aac            # AAC-LC, mono or stereo; we add a silent track
+  progressive: true
+  closed_gop: true
+# Our own target, inside X's limits (spec §8.3: 20-40 s).
+target:
+  duration_s: [20, 40]
+  square: [720, 720]
+  wide: [1280, 720]
+  fps: 30

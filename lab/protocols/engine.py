@@ -112,6 +112,7 @@ class Engine:
             "experiment": experiment, "protocol": protocol["id"], "item": item["id"],
             "split": item.get("split") if item.get("split") in ("dev", "holdout") else None,
             "question": item["text"], "label_set": run.label_set, "gold": item.get("gold"),
+            "flags": list(item.get("flags", [])),
             "evidence": [self._public_ev(ev, run) for ev in run.evidence],
             "turns": run.turns, "agreement": [round(a, 3) for a in run.agreement],
             "verdict": verdict, "confidence": round(_clamp01(conf, 0.0), 4),
