@@ -388,7 +388,8 @@ def apply_knobs(zid: str, sub: str, knobs: dict[str, Any], pid: str | None = Non
             p["agents"] = value
         else:
             set_path(p, spec["path"], value)
-    p["id"] = pid or f"{p['id']}-" + "-".join(
-        f"{k}{str(v).lower().replace('.', '')[:8]}" for k, v in sorted(knobs.items())
-        if not isinstance(v, list))[:40].rstrip("-")
+    suffix = "-".join(f"{k}{str(v).lower().replace('.', '')[:8]}"
+                      for k, v in sorted(knobs.items()) if not isinstance(v, list))
+    suffix = re.sub(r"[^a-z0-9.-]", "", suffix.replace("_", ""))[:40].strip("-")
+    p["id"] = pid or (f"{p['id']}-{suffix}" if suffix else f"{p['id']}-run")
     return p
