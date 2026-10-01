@@ -1,0 +1,44 @@
+# Domains evidence retrieval must never return (leakage guard, spec §4.3).
+# One domain per line; subdomains are blocked too. Lines starting with # are comments.
+# Fact-checking organizations
+politifact.com
+snopes.com
+factcheck.org
+fullfact.org
+leadstories.com
+checkyourfact.com
+truthorfiction.com
+africacheck.org
+factcheck.afp.com
+apnews.com/hub/ap-fact-check
+reuters.com/fact-check
+usatoday.com/news/factcheck
+washingtonpost.com/politics/fact-checker
+poynter.org
+ifcncodeofprinciples.poynter.org
+healthfeedback.org
+climatefeedback.org
+sciencefeedback.co
+logically.ai
+boomlive.in
+altnews.in
+maldita.es
+newtral.es
+correctiv.org
+pagellapolitica.it
+aosfatos.org
+chequeado.com
+teyit.org
+factly.in
+vishvasnews.com
+# Fact-check aggregators and dataset sources
+toolbox.google.com/factcheck
+factchecktools.withgoogle.com
+huggingface.co
+github.com/chenxwh/averitec
+fever.ai
+paperswithcode.com
+kaggle.com
+arxiv.org
+aclanthology.org
+semanticscholar.org

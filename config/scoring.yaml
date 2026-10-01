@@ -1,0 +1,45 @@
+# Precise score definitions (§6). Locked path.
+accuracy:
+  primary: macro_f1          # macro-F1 over the item's label_set, holdout
+  also: [accuracy, per_label_recall]
+calibration:
+  ece_bins: 10               # equal-width bins over reported confidence
+  brier: multiclass          # sum over labels of (p_label - y_label)^2, confidence on verdict, rest spread uniformly
+promotion:
+  bootstrap_resamples: 10000
+  ci: 0.95
+  seed: 20261001
+  post_cutoff_tolerance: 0.02   # max allowed drop in post-cutoff macro-F1
+  ece_tolerance: 0.02           # max allowed rise in ECE
+  holdout_gate_margin: 0.03     # run holdout if dev macro-F1 >= champion dev macro-F1 - margin
+readability:
+  max_grade_level: 9
+  rationale_max_words: 60
+  floor: 0.6                    # composite readability floor for Track B selection
+glance:
+  fields: [verdict, confidence, main_reason]
+  confidence_tolerance: 0.1     # |read - true| within this counts as recovered
+human:
+  wilson_z: 1.96
+poll:
+  options: ["Yes, and convincing", "Right, but weak evidence", "Wrong verdict", "Can't tell"]
+  min_votes: 20
+  wrong_verdict_review_threshold: 0.35   # share of votes; above → review item
+  wilson_z: 1.96
+social:
+  pull_hours: [24, 72]
+  interactions: [likes, reposts, replies, quotes, bookmarks]
+  trailing_days: 30
+raters:                         # §6.4 (GATE: Rex approves thresholds, decision §14.7)
+  eligibility:
+    min_account_age_days: 90
+    min_posts: 50
+    min_calibration_cases: 3
+    exclude_automated: true
+  reliability_prior: [2, 2]     # Beta(a, b)
+  verified_expert_floor: 0.8
+  clout: {base_followers: 1000, slope: 0.25, min: 0.75, max: 1.5}
+  max_share_per_case: 0.05
+  max_ratings_per_day: 20
+  min_effective_n: 15
+  burst: {window_minutes: 10, min_new_raters: 8, new_rater_days: 7}

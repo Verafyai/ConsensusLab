@@ -1,0 +1,15 @@
+# USD per million tokens, maintained by Rex. Never hardcoded in code.
+# A model used by any protocol with a missing or PLACEHOLDER price makes the lab refuse to run.
+# Keys are the provider model ids from config/models.yaml.
+models:
+  claude-opus-5-5:           {input: PLACEHOLDER, output: PLACEHOLDER, cache_read: PLACEHOLDER}
+  claude-sonnet-5-5:         {input: PLACEHOLDER, output: PLACEHOLDER, cache_read: PLACEHOLDER}
+  claude-haiku-4-5:          {input: PLACEHOLDER, output: PLACEHOLDER, cache_read: PLACEHOLDER}
+  grok-4.7:                  {input: PLACEHOLDER, output: PLACEHOLDER, cache_read: PLACEHOLDER}
+  grok-4.7-fast:             {input: PLACEHOLDER, output: PLACEHOLDER, cache_read: PLACEHOLDER}
+# Per-request prices for non-token services.
+services:
+  search_per_query: PLACEHOLDER     # evidence search API
+  fetch_per_page: 0.0
+  x_post: PLACEHOLDER               # X API per post (pay-per-use tiers)
+  x_read: PLACEHOLDER               # X API per read request

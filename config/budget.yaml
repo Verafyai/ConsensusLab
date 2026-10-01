@@ -1,0 +1,16 @@
+# Budget caps in USD. Set by Rex (GATE, see ops/queue/). Locked path: agents may not edit.
+# The lab refuses to run while any value is PLACEHOLDER.
+max_usd_per_item: PLACEHOLDER            # hard cap for any single item run
+max_usd_per_item_champion: PLACEHOLDER   # promotion rule §6.2 (4)
+max_usd_per_experiment: PLACEHOLDER      # dev + holdout
+max_usd_per_day: PLACEHOLDER
+max_usd_per_month: PLACEHOLDER
+social:
+  max_usd_per_day: PLACEHOLDER           # xAI writing + X API costs
+  max_usd_per_month: PLACEHOLDER
+alerts: [0.5, 0.8]                       # fractions of daily and monthly caps
+season0:                                 # §5.3 Season 0 (GATE, decision §14.6)
+  max_usd_screening: PLACEHOLDER         # all configs × 100 dev items
+  max_usd_holdout: PLACEHOLDER           # finalists + controls × full holdout
+  screening_items: 100
+  finalists: 4
