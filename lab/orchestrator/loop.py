@@ -519,9 +519,9 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--cycles", type=int)
     ap.add_argument("--no-commit", action="store_true")
     args = ap.parse_args(argv)
+    from harness.health import Pulse
     from lab.experimenter.claude import ClaudeExperimenter
     from lab.orchestrator.factory import build
-    from harness.health import Pulse
     with Pulse("orchestrator") as pulse:
         orch = build(ClaudeExperimenter(), commit=not args.no_commit)
         orch.pulse = pulse
@@ -530,6 +530,7 @@ def main(argv: list[str] | None = None) -> int:
             # Event-driven: when budget or STOP ends the loop, stay alive (heartbeat green,
             # state "waiting") so the dashboard queue can still be served tomorrow.
             import time
+
             from lab.orchestrator import jobs
             while not paths.STOP.exists():
                 pulse.state = "waiting"

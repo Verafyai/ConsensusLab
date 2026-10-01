@@ -37,8 +37,8 @@ def recent_errors(hours: float = 24) -> list[dict]:
 
 def check(now: float | None = None) -> dict:
     """Everything the monitor shows, plus red/green. Pure enough to test."""
-    from lab.config import get
     from lab.clients.meter import Meter
+    from lab.config import get
     st = health.status(now=now)
     problems = []
     for comp in WATCHED:
