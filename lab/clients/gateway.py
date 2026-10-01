@@ -73,7 +73,9 @@ class Gateway:
         hit = self.cache.get(key)
         if hit is not None:
             self.meter.record(scope, spec["id"], hit.usage, 0.0, cached=True)
-            return self._response(req, hit, spec["id"], usd=0.0, cached=True, latency=0.0)
+            r = self._response(req, hit, spec["id"], usd=0.0, cached=True, latency=0.0)
+            r.meta["list_usd"] = cost_usd(hit.usage, price)   # what it cost when first run
+            return r
 
         est = self.estimate(req)
         self.meter.reserve(est, scope)       # raises before anything is sent
@@ -98,7 +100,9 @@ class Gateway:
         self.meter.record(scope, spec["id"], result.usage, usd, cached=False, latency_s=latency,
                           reserved=est)
         self.cache.put(key, result)
-        return self._response(req, result, spec["id"], usd=usd, cached=False, latency=latency)
+        r = self._response(req, result, spec["id"], usd=usd, cached=False, latency=latency)
+        r.meta["list_usd"] = usd
+        return r
 
     @staticmethod
     def _response(req, result, model_id, usd, cached, latency) -> Response:

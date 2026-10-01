@@ -53,6 +53,7 @@ class Run:
     agreement: list[float] = field(default_factory=list)
     stance: dict[str, dict[str, str]] = field(default_factory=lambda: defaultdict(dict))
     usd: float = 0.0
+    list_usd: float = 0.0       # cost as if nothing were cached
 
     @property
     def label_set(self) -> list[str]:
@@ -117,6 +118,7 @@ class Engine:
             "rationale": _words(rationale, run.rationale_words),
             "reasons": [_words(r, 14) for r in reasons[:2]],
             "usd": round(iscope.spent.get(f"item:{item['id']}", 0.0), 6),
+            "usd_uncached": round(run.list_usd, 6),
             "latency_s": round(time.monotonic() - t0, 3), "error": error,
         }
         if t["split"] is None:
@@ -184,6 +186,7 @@ class Engine:
                       effort=agent.get("effort"))
         resp = self.gw.call(req, run.scope)
         run.usd += resp.usd
+        run.list_usd += resp.meta.get("list_usd", resp.usd)
         if record:
             d = resp.data if isinstance(resp.data, dict) else {}
             body = d.get("argument") or d.get("rationale") or d.get("summary") or ""
