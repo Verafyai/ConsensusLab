@@ -14,11 +14,11 @@ Live build status (spec §12). A chunk is DONE only when every acceptance criter
 | E05 | Scoring | E01 | DONE | 2026-10-01 · 9b90ccc | Hand-computed fixtures; deterministic bootstrap. |
 | E06 | Orchestrator | E04, E05 | DONE | 2026-10-01 · 45a7403 | E2E with stub experimenter: better promoted, noise = no detectable difference, over-budget refused. |
 | E07 | Experimenter | E06 | BUILT | 2026-10-01 · ddb4cfe | Prompt, sandboxed headless runner (holdout canary test passed with real claude), dev-only tools, consolidation, hit rate; 5 cycles offline. 5 live cycles need G-001..G-003. |
-| E08 | Evidence replay | E04 | BUILT | 2026-10-01 | Replay app with card mode, autoplay, phone layout; browser-tested on samples. Real transcripts need a live run. |
+| E08 | Evidence replay | E04 | BUILT | 2026-10-01 · 9c39222 | Replay, card mode, autoplay, captions, phone layout; browser-tested on 3 samples. 'Renders from real transcripts' needs a live run (G-001..G-003). |
 | E09 | Performance dashboard and lab controls | E04c, E05, E08 | BUILT | 2026-10-01 · 7bb62c0 | Snapshot, server, controls, job queue, Record, static export; UI tested on demo data. Real data needs a live run. |
 | E10 | Readability and glanceability | E08 | BUILT | 2026-10-01 · 7bb62c0 | Readability + five-second glance + human agreement report; live card read needs keys. |
-| E11 | herdr harness | E06 | BUILT | 2026-10-01 · 7bb62c0 | launch.sh (herdr-plus template, tmux fallback), panes, monitor red on dead/stale/cap tested. Live herdr launch not yet run. |
-| E12 | Video | E08 | BUILT | 2026-10-01 · c46ca73 | Renderer + validation against X limits checked from docs (720x720; 1080 square is over X's 1024 cap). |
+| E11 | herdr harness | E06 | BUILT | 2026-10-01 · 7bb62c0 | launch.sh (herdr-plus template, tmux fallback), panes, monitor red on dead/stale/cap tested. Live herdr launch not yet run. E11b Return To Office feed built (ops/rto, G-007). |
+| E12 | Video | E08 | DONE | 2026-10-01 · 9c39222 | 720x720 MP4 in ~32 s, 29.7 s long, passes X limits (checked from docs); captions verified legible on frames. |
 | E13 | Grok agent | E12, E06 | BUILT | 2026-10-01 · c46ca73 | Policy in code, flagged exclusion, committed-file rule, PAUSE tested. Live smoke post needs G-005. |
 | E14 | Collector | E13 | BUILT | 2026-10-01 · c46ca73 | 24/72h scores, injection-as-data test. Real post needs G-005. |
 | E15 | Track B experiments | E10, E14 | BUILT | 2026-10-01 · 7bb62c0 | Variant scoring + §6.3 selection rule tested. A live presentation experiment needs data + keys. |
