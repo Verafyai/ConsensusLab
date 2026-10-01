@@ -1,0 +1,50 @@
+zone: Z3
+name: Iterative revision
+control:
+  protocol: z2-self-consistency
+  matched_cost: true
+free:
+- id
+- description
+- tags
+- controls
+- paper
+knobs:
+  agents:
+    path: agents
+    count:
+    - 2
+    - 5
+    roles:
+    - answerer
+    models:
+    - claude-sonnet
+    - claude-haiku
+    - grok-fast
+  rounds:
+    path: rounds
+    range:
+    - 1
+    - 4
+    int: true
+  peer_view:
+    path: peer_view
+    values:
+    - verdict
+    - rationale
+    - full
+  communication:
+    path: communication
+    values:
+    - simultaneous
+    - simultaneous_summarizer
+  agreement_intensity:
+    path: agreement_intensity
+    range:
+    - 0.0
+    - 1.0
+  early_stop:
+    path: early_stop.agree
+    values:
+    - true
+    - false

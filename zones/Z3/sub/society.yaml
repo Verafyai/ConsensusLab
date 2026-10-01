@@ -1,0 +1,29 @@
+id: z3-society
+description: Three claude-sonnet copies answer independently, read each other's answers and revise for
+  two rounds; majority of final answers (Du et al. 2023).
+pattern: society
+paper: 02-du-2023-multiagent-debate
+tags:
+- season0
+- z3
+- zone-template
+evidence:
+  retrieve: true
+  max_sources: 6
+  per_agent: shared
+agents:
+- role: answerer
+  model: claude-sonnet
+  name: agent-1
+- role: answerer
+  model: claude-sonnet
+  name: agent-2
+- role: answerer
+  model: claude-sonnet
+  name: agent-3
+rounds: 2
+communication: simultaneous
+agreement_intensity: 0.5
+early_stop:
+  agree: false
+aggregation: majority

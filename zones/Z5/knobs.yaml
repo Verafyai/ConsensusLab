@@ -1,0 +1,50 @@
+zone: Z5
+name: Information-asymmetric debate
+control:
+  protocol: michael-consultancy
+free:
+- id
+- description
+- tags
+- controls
+- paper
+knobs:
+  judge_model:
+    path: agents[role=judge].model
+    values: &id001
+    - claude-sonnet
+    - claude-haiku
+    - grok-fast
+    - grok
+    - claude-opus
+  quote_words:
+    path: quotes.max_words
+    range:
+    - 10
+    - 40
+    int: true
+  best_of_n:
+    path: best_of_n
+    range:
+    - 1
+    - 8
+    int: true
+  rounds:
+    path: rounds
+    range:
+    - 1
+    - 4
+    int: true
+  judge_sees:
+    path: evidence.judge_sees
+    values:
+    - quotes
+    - none
+  side_assignment:
+    path: swap_sides
+    values:
+    - true
+    - false
+  advocate_models:
+    path: agents[role=advocate].model
+    values: *id001

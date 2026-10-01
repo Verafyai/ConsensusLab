@@ -68,7 +68,9 @@ class Orchestrator:
     workers: int = 4
     resamples: int | None = None
     commit: bool = False                     # git-commit outputs at the end of each cycle
+    constraint: dict | None = None           # zone refinement run (lab.zones.refine)
     log: list[str] = field(default_factory=list)
+    _zone_snapshot: object = None
 
     # ------------------------------------------------------------------ paths and state
     @property
@@ -143,7 +145,22 @@ class Orchestrator:
             "max_usd_per_experiment": self.cfg.cap("max_usd_per_experiment"),
             "dev_items": len(self.data.dev),
             "holdout_evals_left_this_week": self.holdout_evals_left(),
+            "refinement": self._refinement_context(),
         }
+
+    def _refinement_context(self) -> dict | None:
+        if not self.constraint:
+            return None
+        from lab import zones
+        z = zones.load(self.constraint["zone"])
+        b = zones.board(z.id, self.results(), z)
+        return {"zone": z.id, "name": z.name, "knobs": z.knobs,
+                "sub_techniques": {k: v["id"] for k, v in z.subs.items()},
+                "best": b.get("best"), "rows": b.get("rows", [])[:10],
+                "budget_left": self.constraint["budget"] - self.constraint.get("spent", 0.0),
+                "steer": self.constraint.get("steer", ""),
+                "rule": "Propose one of this zone's sub-technique templates with only its knobs "
+                        "changed, inside knobs.yaml ranges. Dev split only."}
 
     # ------------------------------------------------------------------ proposal parsing
     @staticmethod
@@ -186,10 +203,15 @@ class Orchestrator:
         self.emit("cycle.start", experiment=exp_id)
 
         head, dirty = locks.snapshot(self.root) if (self.root / ".git").exists() else ("", set())
+        if self.constraint:
+            from lab import zones
+            # Freeze the zone before the experimenter runs, so it can't widen its own knobs.
+            self._zone_snapshot = zones.load(self.constraint["zone"])
         self.experimenter.propose(exp_id, exp_dir, self.context())
         if head:
+            deny = ["zones/**"] if self.constraint else None
             reverted = locks.enforce(self.root, head, extra_allowed=[f"experiments/{exp_id}/**"],
-                                     ignore=dirty)
+                                     ignore=dirty, deny=deny)
             if reverted:
                 self.emit("locks.reverted", experiment=exp_id, paths=reverted)
                 (exp_dir / "reverted.txt").write_text("\n".join(reverted) + "\n")
@@ -235,6 +257,14 @@ class Orchestrator:
         base.update(protocol=protocol["id"], zone=prop.get("zone") or _zone(protocol),
                     paper=protocol.get("paper"), tags=protocol.get("tags", []),
                     track=prop.get("track", "A"))
+        if self.constraint:
+            from lab import zones
+            sub, zproblems = zones.check_refinement(protocol, self._zone_snapshot)
+            base["zone"] = self.constraint["zone"]
+            base["refinement"] = {"zone": self.constraint["zone"], "sub": sub}
+            if zproblems:
+                return self._finish(exp_id, exp_dir, {**base, "status": "invalid",
+                                                      "reason": "; ".join(zproblems)}, prop)
         try:
             self.cfg.require_ready(models_used(protocol))
         except LabNotReady as e:
@@ -268,7 +298,11 @@ class Orchestrator:
                                                   "reason": reason}, prop)
 
         # --- dev run (§7.1 step 4)
-        scope = Scope(experiment=exp_id, caps={"experiment": exp_cap})
+        caps = {"experiment": exp_cap}
+        if self.constraint:
+            caps["refinement"] = max(0.0, self.constraint["budget"] -
+                                     self.constraint.get("spent", 0.0))
+        scope = Scope(experiment=exp_id, caps=caps)
         self.heartbeat("dev", experiment=exp_id, protocol=protocol["id"])
         try:
             dev_ts = run_protocol(self.engine, protocol, dev, scope, exp_id, self.workers,
@@ -289,6 +323,10 @@ class Orchestrator:
                                                   "reason": str(e)}, prop)
         base["cases"] = interesting_cases(dev_ts)
         base["champion_before"] = champ_id
+        if self.constraint and self.constraint.get("dev_only"):
+            return self._finish(exp_id, exp_dir, {**base, "status": "dev_only",
+                                                  "reason": "zone refinement run (dev only)"},
+                                prop)
 
         # --- gate to holdout (§7.1 step 5)
         margin = self.cfg.scoring["promotion"]["holdout_gate_margin"]

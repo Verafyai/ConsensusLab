@@ -1,0 +1,34 @@
+id: z6-diverse-personas
+description: ChatEval persona panel. Three judges with distinct personas discuss one by one for two rounds,
+  each seeing earlier speakers; majority of final-round verdicts.
+pattern: chateval
+paper: 04-chan-2023-chateval
+tags:
+- season0
+- z6
+- zone-template
+evidence:
+  retrieve: true
+  max_sources: 6
+  per_agent: shared
+agents:
+- role: judge
+  model: claude-sonnet
+  name: critic
+  persona: Critic. Question the other referees' judgments to make sure they are well-considered; probe
+    weak reasoning, overstated sources and missing context, and offer an alternative reading when the
+    case looks evenly balanced.
+- role: judge
+  model: claude-sonnet
+  name: news-author
+  persona: 'News Author. Focus on consistency with the original sources: check that each claim element
+    is actually stated in the evidence, with the right numbers, dates, people and scope.'
+- role: judge
+  model: claude-sonnet
+  name: scientist
+  persona: Scientist. A professional with a strong background in the scientific method, critical thinking
+    and problem-solving; weigh the quality and independence of sources and whether the evidence truly
+    supports the conclusion.
+rounds: 2
+communication: one_by_one
+aggregation: majority

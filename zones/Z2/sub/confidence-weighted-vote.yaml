@@ -1,0 +1,22 @@
+id: z2-confidence-weighted-vote
+description: Three models from two families vote, weighted by stated confidence.
+pattern: panel
+tags:
+- baseline
+- z2
+- zone-template
+evidence:
+  retrieve: true
+  max_sources: 6
+  per_agent: shared
+agents:
+- role: answerer
+  model: claude-sonnet
+  name: sonnet
+- role: answerer
+  model: grok-fast
+  name: grok
+- role: answerer
+  model: claude-haiku
+  name: haiku
+aggregation: weighted

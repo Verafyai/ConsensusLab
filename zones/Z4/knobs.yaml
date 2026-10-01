@@ -1,0 +1,59 @@
+zone: Z4
+name: Adversarial debate
+control:
+  zone_best: Z2
+  matched_cost: true
+free:
+- id
+- description
+- tags
+- controls
+- paper
+knobs:
+  rounds:
+    path: rounds
+    range:
+    - 1
+    - 4
+    int: true
+  judge_model:
+    path: agents[role=judge].model
+    values:
+    - claude-sonnet
+    - claude-haiku
+    - grok-fast
+    - grok
+    - claude-opus
+  advocate_models:
+    path: agents[role=advocate].model
+    values:
+    - claude-sonnet
+    - claude-haiku
+    - grok-fast
+  early_stop:
+    path: early_stop.judge_can_end
+    values:
+    - true
+    - false
+  min_rounds:
+    path: early_stop.min_rounds
+    range:
+    - 1
+    - 3
+    int: true
+  side_assignment:
+    path: swap_sides
+    values:
+    - true
+    - false
+  judge_sees:
+    path: evidence.judge_sees
+    values:
+    - full
+    - quotes
+    - none
+  agreement_intensity:
+    path: agreement_intensity
+    range:
+    - 0.0
+    - 1.0

@@ -47,6 +47,11 @@ def find_protocol(pid: str, known: set[str] | None = None) -> dict:
         f = d / f"{pid}.yaml"
         if f.exists():
             return load_protocol(f, known)
+    from lab.protocols.schema import validate_protocol
+    from lab.zones import template_ids
+    t = template_ids().get(pid)
+    if t is not None:
+        return validate_protocol(t, known)
     raise FileNotFoundError(f"protocol {pid!r} not in the library")
 
 

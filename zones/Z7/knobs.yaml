@@ -1,0 +1,28 @@
+zone: Z7
+name: Evidence-first aggregation
+control:
+  protocol: z1-with-evidence
+free:
+- id
+- description
+- tags
+- controls
+- paper
+knobs:
+  graders:
+    path: agents
+    count:
+    - 1
+    - 5
+    roles:
+    - grader
+    models:
+    - claude-sonnet
+    - claude-haiku
+    - grok-fast
+  max_sources:
+    path: evidence.max_sources
+    range:
+    - 3
+    - 12
+    int: true

@@ -46,12 +46,14 @@ def snapshot(root: Path | None = None) -> tuple[str, set[str]]:
 
 
 def enforce(root: Path | None = None, since: str = "HEAD",
-            extra_allowed: list[str] | None = None, ignore: set[str] | None = None) -> list[str]:
+            extra_allowed: list[str] | None = None, ignore: set[str] | None = None,
+            deny: list[str] | None = None) -> list[str]:
     """Revert every disallowed change made since `since`. Returns the reverted paths.
     `ignore` holds paths that were already dirty before the experimenter started."""
     root = root or paths.ROOT
     bad = [p for p in changed_paths(root, since)
-           if not allowed(p, extra_allowed) and p not in (ignore or set())]
+           if (not allowed(p, extra_allowed) or any(fnmatch.fnmatch(p, d) for d in deny or []))
+           and p not in (ignore or set())]
     for p in bad:
         tracked = subprocess.run(["git", "cat-file", "-e", f"{since}:{p}"], cwd=root,
                                  capture_output=True).returncode == 0

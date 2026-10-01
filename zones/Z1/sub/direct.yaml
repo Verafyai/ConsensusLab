@@ -1,0 +1,13 @@
+id: z1-direct
+description: One model, no retrieval. Measures what the model knows on its own (and memorization).
+pattern: single
+tags:
+- baseline
+- z1
+- zone-template
+evidence:
+  retrieve: false
+agents:
+- role: answerer
+  model: claude-sonnet
+aggregation: majority

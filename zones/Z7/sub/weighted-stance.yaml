@@ -1,0 +1,19 @@
+id: z7-weighted-stance
+description: Three graders from two families; stances weighted by strength.
+pattern: evidence_first
+tags:
+- baseline
+- z7
+- zone-template
+evidence:
+  retrieve: true
+  max_sources: 8
+  per_agent: shared
+agents:
+- role: grader
+  model: claude-haiku
+- role: grader
+  model: grok-fast
+- role: grader
+  model: claude-sonnet
+aggregation: stance

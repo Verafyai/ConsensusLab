@@ -1,0 +1,18 @@
+id: z1-reasoning-first
+description: 'One model, evidence, higher effort: reasons more before answering.'
+pattern: single
+tags:
+- baseline
+- z1
+- zone-template
+evidence:
+  retrieve: true
+  max_sources: 6
+  per_agent: shared
+agents:
+- role: answerer
+  model: claude-sonnet
+  effort: medium
+aggregation: majority
+output:
+  rationale_words: 60

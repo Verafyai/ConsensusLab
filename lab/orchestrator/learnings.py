@@ -62,6 +62,14 @@ def from_result(result: dict, proposal: dict) -> dict:
     if st in ("rejected_budget", "invalid", "error"):
         status = "tentative"
         lesson = f"Not run: {result.get('reason', st)}"
+    elif st == "dev_only":
+        status = "tentative"
+        cd = result.get("vs_champion_dev") or {}
+        lesson = (f"{result['protocol']} ({result.get('zone')} refinement): dev macro-F1 "
+                  f"{result['dev']['macro_f1']:.3f}" +
+                  (f", {cd['diff']:+.3f} vs champion on dev" if cd.get("diff") is not None
+                   else "") + ".")
+        vs = cd
     elif st == "stopped_at_dev":
         status = "tentative"
         lesson = (f"{result['protocol']} reached dev macro-F1 {result['dev']['macro_f1']:.3f}, "

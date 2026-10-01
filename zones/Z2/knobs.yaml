@@ -1,0 +1,37 @@
+zone: Z2
+name: Sampling and ensembles
+control:
+  zone_best: Z1
+free:
+- id
+- description
+- tags
+- controls
+- paper
+knobs:
+  samples:
+    path: agents[*].samples
+    range:
+    - 3
+    - 15
+    int: true
+  panel:
+    path: agents
+    count:
+    - 2
+    - 7
+    roles:
+    - answerer
+    models: &id001
+    - claude-sonnet
+    - claude-haiku
+    - grok-fast
+  vote_rule:
+    path: aggregation
+    values:
+    - majority
+    - weighted
+    - mean_prob
+  model:
+    path: agents[*].model
+    values: *id001

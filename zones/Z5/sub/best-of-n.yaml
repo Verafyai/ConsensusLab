@@ -1,0 +1,33 @@
+id: z5-best-of-n
+description: Khan et al. 2024. Information-asymmetric debate with optimised debaters. Each turn the advocate
+  drafts 4 arguments and the judge model picks the most persuasive; the judge sees only the debate plus
+  verified/unverified quotes. Three fixed rounds.
+pattern: debate
+paper: 06-khan-2024-persuasive-debaters-truthful
+tags:
+- season0
+- z5
+- zone-template
+evidence:
+  retrieve: true
+  max_sources: 6
+  per_agent: shared
+  judge_sees: quotes
+quotes:
+  verify: true
+  max_words: 30
+best_of_n: 4
+agents:
+- role: advocate
+  side: affirm
+  model: claude-sonnet
+- role: advocate
+  side: deny
+  model: grok-fast
+- role: judge
+  model: claude-sonnet
+rounds: 3
+aggregation: judge
+budget:
+  max_usd_per_item: 0.6
+swap_sides: true

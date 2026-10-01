@@ -1,0 +1,35 @@
+id: z5-verified-quotes
+description: Michael et al. 2023. Information-asymmetric debate. Advocates read the retrieved evidence;
+  the judge sees only the debate plus cited quotes, each checked verbatim against its source and marked
+  VERIFIED or UNVERIFIED. The judge may end the debate after round 2.
+pattern: debate
+paper: 05-michael-2023-debate-supervise-unreliable-experts
+tags:
+- season0
+- z5
+- zone-template
+evidence:
+  retrieve: true
+  max_sources: 6
+  per_agent: shared
+  judge_sees: quotes
+quotes:
+  verify: true
+  max_words: 40
+agents:
+- role: advocate
+  side: affirm
+  model: claude-sonnet
+- role: advocate
+  side: deny
+  model: grok-fast
+- role: judge
+  model: claude-sonnet
+rounds: 3
+early_stop:
+  judge_can_end: true
+  min_rounds: 2
+aggregation: judge
+budget:
+  max_usd_per_item: 0.2
+swap_sides: true

@@ -1,0 +1,35 @@
+zone: Z1
+name: Single model
+control: null
+free:
+- id
+- description
+- tags
+- controls
+- paper
+knobs:
+  model:
+    path: agents[*].model
+    values:
+    - claude-sonnet
+    - claude-haiku
+    - grok-fast
+    - grok
+    - claude-opus
+  evidence:
+    path: evidence.retrieve
+    values:
+    - true
+    - false
+  max_sources:
+    path: evidence.max_sources
+    range:
+    - 2
+    - 10
+    int: true
+  effort:
+    path: agents[*].effort
+    values:
+    - low
+    - medium
+    - high

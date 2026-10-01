@@ -1,0 +1,38 @@
+zone: Z6
+name: Persona panels
+control:
+  protocol: chateval-panel-same-persona
+free:
+- id
+- description
+- tags
+- controls
+- paper
+knobs:
+  personas:
+    path: agents[role=judge].persona
+    free_text: true
+  panel:
+    path: agents
+    count:
+    - 2
+    - 5
+    roles:
+    - judge
+    - summarizer
+    models:
+    - claude-sonnet
+    - claude-haiku
+    - grok-fast
+  mode:
+    path: communication
+    values:
+    - one_by_one
+    - simultaneous
+    - simultaneous_summarizer
+  rounds:
+    path: rounds
+    range:
+    - 1
+    - 3
+    int: true

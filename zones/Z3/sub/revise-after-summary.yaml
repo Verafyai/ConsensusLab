@@ -1,0 +1,28 @@
+id: z3-revise-after-summary
+description: Agents revise after reading a summary of the panel's answers.
+pattern: society
+paper: 02-du-2023-multiagent-debate
+tags:
+- season0
+- z3
+- zone-template
+evidence:
+  retrieve: true
+  max_sources: 6
+  per_agent: shared
+agents:
+- role: answerer
+  model: claude-sonnet
+  name: agent-1
+- role: answerer
+  model: claude-sonnet
+  name: agent-2
+- role: answerer
+  model: claude-sonnet
+  name: agent-3
+rounds: 2
+communication: simultaneous_summarizer
+agreement_intensity: 0.5
+early_stop:
+  agree: false
+aggregation: majority

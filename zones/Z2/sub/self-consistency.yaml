@@ -1,0 +1,16 @@
+id: z2-self-consistency
+description: One model sampled five times on the same evidence; majority vote; confidence = agreement.
+pattern: sample_vote
+tags:
+- baseline
+- z2
+- zone-template
+evidence:
+  retrieve: true
+  max_sources: 6
+  per_agent: shared
+agents:
+- role: answerer
+  model: claude-sonnet
+  samples: 5
+aggregation: majority
