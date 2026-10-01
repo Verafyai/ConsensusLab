@@ -1,0 +1,8 @@
+[
+ {"claim": "The city of Lagos has more residents than all of Ghana.", "label": "Refuted", "claim_date": "14-03-2022", "speaker": "Twitter user", "original_claim_url": "https://example.org/post/1", "fact_checking_article": "https://africacheck.org/fact-checks/lagos-ghana", "justification": "Ghana's census population exceeds Lagos estimates."},
+ {"claim": "Drinking hot water kills the coronavirus.", "label": "Refuted", "claim_date": "02-04-2020", "speaker": null, "fact_checking_article": "https://www.snopes.com/x", "justification": "No evidence; virus replicates in cells."},
+ {"claim": "Solar capacity in India doubled between 2018 and 2022.", "label": "Supported", "claim_date": "10-01-2023", "fact_checking_article": "https://fullfact.org/y", "justification": "Official grid data shows doubling."},
+ {"claim": "A new law bans cash payments over 1000 euros.", "label": "Conflicting Evidence/Cherrypicking", "claim_date": "05-05-2021", "fact_checking_article": "https://maldita.es/z", "justification": "True for some transactions only."},
+ {"claim": "The vaccine contains a tracking microchip.", "label": "Not Enough Evidence", "claim_date": "bad-date", "fact_checking_article": "https://example.org/w"},
+ {"claim": "Ignored row with unknown label.", "label": "Weird"}
+]

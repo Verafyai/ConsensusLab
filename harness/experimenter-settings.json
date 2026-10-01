@@ -1,0 +1,35 @@
+{
+  "permissions": {
+    "allow": [
+      "Read(./**)",
+      "Edit(./experiments/**)",
+      "Write(./experiments/**)",
+      "Edit(./lab/protocols/library/**)",
+      "Write(./lab/protocols/library/**)",
+      "Edit(./library/cards/**)",
+      "Write(./library/cards/**)",
+      "Edit(./viz/variants/**)",
+      "Write(./viz/variants/**)",
+      "Bash(uv run python -m lab.experimenter.tools:*)"
+    ],
+    "deny": [
+      "Read(~/.consensus-lab/**)",
+      "Read(//**/.consensus-lab/**)",
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(./.cache/**)",
+      "Edit(./lab/orchestrator/**)",
+      "Edit(./lab/scoring/**)",
+      "Edit(./lab/clients/**)",
+      "Edit(./config/**)",
+      "Edit(./social/**)",
+      "Edit(./harness/**)",
+      "Edit(./tests/**)",
+      "Edit(./STEERING.md)",
+      "Edit(./CHARTER.md)",
+      "Edit(./.claude/**)",
+      "WebFetch",
+      "WebSearch"
+    ]
+  }
+}

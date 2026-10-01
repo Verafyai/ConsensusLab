@@ -1,0 +1,8 @@
+{"claims": [
+ {"text": "A 2026 study found coffee cures migraines.", "claimant": "Viral post", "claimDate": "2026-08-12T00:00:00Z",
+  "claimReview": [{"publisher": {"site": "healthfeedback.org"}, "url": "https://healthfeedback.org/a", "title": "No, coffee does not cure migraines", "reviewDate": "2026-08-15T00:00:00Z", "textualRating": "Inaccurate"}]},
+ {"text": "Disputed claim.", "claimReview": [
+   {"publisher": {"site": "a.org"}, "url": "https://a.org/1", "textualRating": "True"},
+   {"publisher": {"site": "b.org"}, "url": "https://b.org/1", "textualRating": "False"}]},
+ {"text": "Satire piece.", "claimReview": [{"publisher": {"site": "c.org"}, "url": "https://c.org/1", "textualRating": "Satire"}]}
+]}
