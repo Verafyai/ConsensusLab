@@ -17,3 +17,5 @@ social/PAUSE
 ops/heartbeat.json
 ops/events.jsonl
 *.mp4
+library/pdfs/
+library/text/
