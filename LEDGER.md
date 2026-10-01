@@ -4,15 +4,15 @@ Live build status (spec §12). A chunk is DONE only when every acceptance criter
 
 | ID | Chunk | Depends on | Status | Done (date · commit) | Notes |
 |---|---|---|---|---|---|
-| E00 | Scaffold | none | TODO | | |
-| E01 | Data | E00 | TODO | | |
-| E02 | Clients and metering | E00 | TODO | | |
-| E03 | Evidence retrieval | E02 | TODO | | |
-| E04 | Protocol engine | E02, E03 | TODO | | |
-| E04b | Library scan and Season 0 | E04 | TODO | | |
-| E04c | Testing zones | E04b | TODO | | |
-| E05 | Scoring | E01 | TODO | | |
-| E06 | Orchestrator | E04, E05 | TODO | | |
+| E00 | Scaffold | none | DONE | 2026-10-01 · a930641 | CI green; `python -m lab check` refuses placeholders. GATE G-001 (budget, prices) open. |
+| E01 | Data | E00 | BUILT | 2026-10-01 · fcd3487 | Schema, 8 ingesters, splits + post-cutoff slice, MDE report, holdout outside repo with permission test. Needs G-002 (sources) to produce real splits. |
+| E02 | Clients and metering | E00 | BUILT | 2026-10-01 · 2f5bebb | Cache=$0 and pre-call refusal tested. Smoke-run reconciliation needs G-003 (keys). |
+| E03 | Evidence retrieval | E02 | DONE | 2026-10-01 · 78a5e5f | Blocklist, date filter, 40-word cap tested. |
+| E04 | Protocol engine | E02, E03 | BUILT | 2026-10-01 · efeaad1 | All baselines run on 10 items offline (fake models) within budget; transcripts validate. Live 10-item run needs G-001..G-003. |
+| E04b | Library scan and Season 0 | E04 | BUILT | 2026-10-01 · 4731ac2 | 8 cards, all page refs verified in CI; seeds; quote verifier; Season 0 plan. GATE G-004 open. |
+| E04c | Testing zones | E04b | BUILT | 2026-10-01 · 587db1b | Knob limits, holdout weekly budget, control/Z1 raw + matched cost tested; 3-iteration refinement offline. Live run needs gates. |
+| E05 | Scoring | E01 | DONE | 2026-10-01 · 9b90ccc | Hand-computed fixtures; deterministic bootstrap. |
+| E06 | Orchestrator | E04, E05 | DONE | 2026-10-01 · 45a7403 | E2E with stub experimenter: better promoted, noise = no detectable difference, over-budget refused. |
 | E07 | Experimenter | E06 | TODO | | |
 | E08 | Evidence replay | E04 | TODO | | |
 | E09 | Performance dashboard and lab controls | E04c, E05, E08 | TODO | | |
