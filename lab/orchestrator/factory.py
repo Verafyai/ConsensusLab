@@ -14,6 +14,8 @@ def build(experimenter, commit: bool = True) -> Orchestrator:
     gw = Gateway.default()
     gw.cfg.require_ready([])
     engine = Engine(gw, Retriever.default(gw.cfg, gw.meter))
+    if hasattr(experimenter, "meter") and experimenter.meter is None:
+        experimenter.meter = gw.meter
     dev = list(read_jsonl(DEV)) if DEV.exists() else []
     if not dev:
         raise SystemExit("No dev items. Approve sources and run `python -m lab.data.build`.")

@@ -20,6 +20,12 @@ ALLOWED = [
 ]
 
 
+# Append-only logs written by the lab's own tools (e.g. the experimenter's metered dev-eval);
+# reverting them would erase spend records.
+NEVER_REVERT = ["ops/spend.jsonl", "ops/events.jsonl", "ops/heartbeat.json",
+                "ops/heartbeat.lock", "ops/holdout_evals.jsonl"]
+
+
 def _git(*args: str, root: Path) -> str:
     return subprocess.run(["git", *args], cwd=root, check=True, capture_output=True,
                           text=True).stdout
@@ -53,7 +59,7 @@ def enforce(root: Path | None = None, since: str = "HEAD",
     root = root or paths.ROOT
     bad = [p for p in changed_paths(root, since)
            if (not allowed(p, extra_allowed) or any(fnmatch.fnmatch(p, d) for d in deny or []))
-           and p not in (ignore or set())]
+           and p not in (ignore or set()) and p not in NEVER_REVERT]
     for p in bad:
         tracked = subprocess.run(["git", "cat-file", "-e", f"{since}:{p}"], cwd=root,
                                  capture_output=True).returncode == 0

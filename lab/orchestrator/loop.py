@@ -228,7 +228,10 @@ class Orchestrator:
         leaderboard.write(self.exp_root)
         entry = learnings.append(learnings.from_result(result, prop))
         learnings.merge_proposals()
+        self._weekly_consolidation()
         learnings.write_markdown()
+        (self.exp_root / "hitrate.json").write_text(json.dumps(
+            learnings.hit_rate(self.results()), indent=1))
         self.emit("cycle.end", experiment=exp_id, status=result["status"], learning=entry["id"])
         if self.commit:
             self._git_commit(f"{exp_id}: {result['protocol']} → {result['status']}")
@@ -398,6 +401,17 @@ class Orchestrator:
         return any(r.get("protocol") == champ_id and
                    ((r.get("holdout") or {}).get("full") or {}).get("n") == n
                    for r in self.results())
+
+    def _weekly_consolidation(self) -> None:
+        stamp = paths.OPS / "last_consolidation.txt"
+        last = datetime.fromisoformat(stamp.read_text().strip()) if stamp.exists() else None
+        now = datetime.now(UTC)
+        if last is None:
+            stamp.parent.mkdir(parents=True, exist_ok=True)
+            stamp.write_text(now.isoformat())
+        elif now - last > timedelta(days=7):
+            self.emit("learnings.consolidated", **learnings.consolidate())
+            stamp.write_text(now.isoformat())
 
     def _resamples(self) -> int:
         return self.resamples or self.cfg.scoring["promotion"]["bootstrap_resamples"]

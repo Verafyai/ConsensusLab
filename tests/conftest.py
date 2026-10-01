@@ -20,7 +20,8 @@ def make_filled_config(tmp_path: Path) -> Path:
     shutil.copytree(paths.CONFIG, dst)
     budget = yaml.safe_load((dst / "budget.yaml").read_text())
     budget.update(max_usd_per_item=0.25, max_usd_per_item_champion=0.08,
-                  max_usd_per_experiment=20.0, max_usd_per_day=50.0, max_usd_per_month=500.0)
+                  max_usd_per_experiment=20.0, max_usd_per_day=50.0, max_usd_per_month=500.0,
+                  experimenter_usd_per_invocation=1.0)
     budget["social"] = {"max_usd_per_day": 2.0, "max_usd_per_month": 30.0}
     budget["season0"].update(max_usd_screening=80.0, max_usd_holdout=200.0)
     (dst / "budget.yaml").write_text(yaml.safe_dump(budget))

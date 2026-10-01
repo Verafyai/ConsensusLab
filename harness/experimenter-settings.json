@@ -31,5 +31,9 @@
       "WebFetch",
       "WebSearch"
     ]
+  },
+  "sandbox": {
+    "enabled": true,
+    "autoAllowBashIfSandboxed": false
   }
 }

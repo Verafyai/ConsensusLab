@@ -41,3 +41,6 @@ roles:
   reply_triage: claude-haiku
   glance_reader: claude-haiku
   social_writer: grok-fast
+# Claude Code model for the experimenter (a Claude Code model name or full id).
+experimenter:
+  model: claude-opus-5-5

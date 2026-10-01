@@ -8,6 +8,7 @@ max_usd_per_month: PLACEHOLDER
 social:
   max_usd_per_day: PLACEHOLDER           # xAI writing + X API costs
   max_usd_per_month: PLACEHOLDER
+experimenter_usd_per_invocation: PLACEHOLDER  # Claude Code spend per proposal
 holdout_evals_per_week: 10              # §5.4: limits peeking at the holdout
 alerts: [0.5, 0.8]                       # fractions of daily and monthly caps
 season0:                                 # §5.3 Season 0 (GATE, decision §14.6)
