@@ -1,5 +1,6 @@
 # Model aliases used by protocols. Panel choice is Rex's decision (§14.3).
 # knowledge_cutoff drives the post-cutoff temporal holdout slice (§4.3).
+# params are sent to the provider (Haiku 4.5 rejects effort, so it has none).
 # Locked path for the experimenter: it may reference aliases but not add or edit them.
 models:
   claude-opus:
@@ -8,12 +9,14 @@ models:
     family: claude
     knowledge_cutoff: PLACEHOLDER
     vision: true
+    params: {effort: low}   # protocols may override per agent
   claude-sonnet:
     provider: anthropic
     id: claude-sonnet-5-5
     family: claude
     knowledge_cutoff: PLACEHOLDER
     vision: true
+    params: {effort: low}
   claude-haiku:
     provider: anthropic
     id: claude-haiku-4-5
