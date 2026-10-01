@@ -21,7 +21,7 @@ def test_cli_check_exits_nonzero_on_placeholder():
     if not load_config().missing():
         pytest.skip("Rex has filled in budget and prices")
     r = subprocess.run([sys.executable, "-m", "lab", "check"], cwd=paths.ROOT,
-                       capture_output=True, text=True)
+                       capture_output=True, text=True, check=False)
     assert r.returncode == 2
     assert "refuses to run" in r.stderr
 

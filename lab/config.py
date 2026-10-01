@@ -49,7 +49,7 @@ class Config:
         try:
             return self.models["models"][alias]
         except KeyError:
-            raise LabNotReady(f"unknown model alias {alias!r} (not in config/models.yaml)")
+            raise LabNotReady(f"unknown model alias {alias!r}") from None
 
     def price(self, model_id: str) -> dict[str, float]:
         p = self.prices.get("models", {}).get(model_id)
