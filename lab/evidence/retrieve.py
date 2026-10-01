@@ -27,6 +27,7 @@ from lab.config import Config
 from lab.evidence import filters
 
 URL_RE = re.compile(r"https?://\S+")
+PASSAGE_WORDS = 150
 
 
 @dataclass
@@ -193,12 +194,22 @@ class Retriever:
         if p.exists():
             return [Hit(**h) for h in json.loads(p.read_text())]
         price = self.estimate()
-        self.meter.check(price, scope)
-        hits = self.backend.search(query, n, before)
-        self.meter.record(scope, f"service:{self.backend.name}", Usage(), price, cached=False)
+        self.meter.reserve(price, scope)
+        try:
+            hits = self.backend.search(query, n, before)
+        except BaseException:
+            self.meter.release(price, scope)
+            raise
+        self.meter.record(scope, f"service:{self.backend.name}", Usage(), price, cached=False,
+                          reserved=price)
         p.parent.mkdir(parents=True, exist_ok=True)
         p.write_text(json.dumps([asdict(h) for h in hits]))
         return hits
+
+    def page_text(self, url: str) -> str | None:
+        """Full fetched text for quote verification (from the local page cache)."""
+        page = self.fetcher.fetch(url)
+        return page.text if page else None
 
     def item_blocklist(self, item: dict) -> list[str]:
         """The dataset's own source pages for this item are blocked too."""
@@ -239,6 +250,8 @@ class Retriever:
                 "id": f"ev{len(out) + 1}", "url": h.url, "title": title[:200],
                 "published": published, "domain": host.removeprefix("www."),
                 "excerpt": filters.best_excerpt(body, query),
+                # Longer window models read; never written to transcripts or shown publicly.
+                "passage": filters.best_excerpt(body, query, PASSAGE_WORDS),
                 "retrieved": datetime.now(UTC).date().isoformat(),
                 "text_sha256": hashlib.sha256(body.encode()).hexdigest(),
             })

@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import json
 import sys
+import threading
 import time
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
@@ -33,10 +34,16 @@ class Scope:
     item: str | None = None
     caps: dict[str, float] = field(default_factory=dict)    # name -> limit
     spent: dict[str, float] = field(default_factory=dict)   # name -> spent so far
+    pending: dict[str, float] = field(default_factory=dict)  # name -> reserved, in flight
+
+    def active_caps(self) -> dict[str, float]:
+        """Caps that apply to this scope: everything except other items' per-item caps."""
+        own = f"item:{self.item}"
+        return {k: v for k, v in self.caps.items() if not k.startswith("item:") or k == own}
 
     def child(self, item: str, item_cap: float) -> Scope:
         """A per-item scope that shares this scope's running totals (dicts are shared)."""
-        s = Scope(self.track, self.experiment, item, self.caps, self.spent)
+        s = Scope(self.track, self.experiment, item, self.caps, self.spent, self.pending)
         s.caps[f"item:{item}"] = item_cap
         s.spent.setdefault(f"item:{item}", 0.0)
         return s
@@ -62,6 +69,8 @@ class Meter:
         self.events = events or paths.EVENTS
         self._totals: dict[tuple[str, str], float] | None = None
         self._alerted: set[str] = set()
+        self._lock = threading.RLock()
+        self._pending: dict[str, float] = {}     # track -> reserved USD in flight
 
     # -- totals ---------------------------------------------------------------------------
     def _load(self) -> dict[tuple[str, str], float]:
@@ -92,24 +101,47 @@ class Meter:
         return {"day": self.cfg.cap("max_usd_per_day"), "month": self.cfg.cap("max_usd_per_month")}
 
     # -- enforcement ----------------------------------------------------------------------
+    def reserve(self, est_usd: float, scope: Scope) -> None:
+        """Atomically check caps and reserve est_usd, so concurrent calls can't jointly
+        overshoot a cap. Pair with record(..., reserved=est_usd) or release()."""
+        with self._lock:
+            self.check(est_usd, scope)
+            self._pending[scope.track] = self._pending.get(scope.track, 0.0) + est_usd
+            for name in scope.active_caps():
+                scope.pending[name] = scope.pending.get(name, 0.0) + est_usd
+
+    def release(self, est_usd: float, scope: Scope) -> None:
+        with self._lock:
+            self._pending[scope.track] = self._pending.get(scope.track, 0.0) - est_usd
+            for name in scope.active_caps():
+                scope.pending[name] = scope.pending.get(name, 0.0) - est_usd
+
     def check(self, est_usd: float, scope: Scope) -> None:
         """Raise BudgetExceeded if est_usd would breach any cap. Called before every call."""
         g = self.global_caps(scope.track)
+        inflight = self._pending.get(scope.track, 0.0)
         for name, limit in g.items():
             period = "day" if name.endswith("day") else "month"
-            would = self.spent(scope.track, period) + est_usd
+            would = self.spent(scope.track, period) + inflight + est_usd
             if would > limit:
                 self._event("budget.halt", {"cap": name, "would_be": would, "limit": limit})
                 raise BudgetExceeded(name, would, limit)
-        for name, limit in scope.caps.items():
-            would = scope.spent.get(name, 0.0) + est_usd
+        for name, limit in scope.active_caps().items():
+            would = scope.spent.get(name, 0.0) + scope.pending.get(name, 0.0) + est_usd
             if would > limit:
                 self._event("budget.refuse", {"cap": name, "would_be": would, "limit": limit,
                                               "experiment": scope.experiment})
                 raise BudgetExceeded(name, would, limit)
 
     def record(self, scope: Scope, model_id: str, usage: Usage, usd: float, cached: bool,
-               latency_s: float = 0.0) -> None:
+               latency_s: float = 0.0, reserved: float = 0.0) -> None:
+        with self._lock:
+            if reserved:
+                self.release(reserved, scope)
+            self._record(scope, model_id, usage, usd, cached, latency_s)
+
+    def _record(self, scope: Scope, model_id: str, usage: Usage, usd: float, cached: bool,
+                latency_s: float) -> None:
         ts = datetime.now(UTC).isoformat(timespec="seconds")
         row = {"ts": ts, "track": scope.track, "experiment": scope.experiment,
                "item": scope.item, "model": model_id, "usd": round(usd, 8), "cached": cached,
@@ -121,7 +153,7 @@ class Meter:
             f.write(json.dumps(row) + "\n")
         self._load()
         self._add(scope.track, ts, usd)
-        for name in scope.caps:
+        for name in scope.active_caps():
             scope.spent[name] = scope.spent.get(name, 0.0) + usd
         self._alerts(scope.track)
 

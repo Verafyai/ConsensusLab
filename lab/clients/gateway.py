@@ -75,22 +75,28 @@ class Gateway:
             self.meter.record(scope, spec["id"], hit.usage, 0.0, cached=True)
             return self._response(req, hit, spec["id"], usd=0.0, cached=True, latency=0.0)
 
-        self.meter.check(self.estimate(req), scope)   # raises before anything is sent
+        est = self.estimate(req)
+        self.meter.reserve(est, scope)       # raises before anything is sent
         t0 = time.monotonic()
         result, delay = None, 2.0
-        for attempt in range(4):
-            try:
-                result = provider.send(req, spec["id"], spec.get("params") or {})
-                break
-            except TransientError:
-                if attempt == 3:
-                    raise
-                self.sleep(delay)
-                delay *= 2
+        try:
+            for attempt in range(4):
+                try:
+                    result = provider.send(req, spec["id"], spec.get("params") or {})
+                    break
+                except TransientError:
+                    if attempt == 3:
+                        raise
+                    self.sleep(delay)
+                    delay *= 2
+        except BaseException:
+            self.meter.release(est, scope)
+            raise
         assert result is not None
         latency = time.monotonic() - t0
         usd = cost_usd(result.usage, price)
-        self.meter.record(scope, spec["id"], result.usage, usd, cached=False, latency_s=latency)
+        self.meter.record(scope, spec["id"], result.usage, usd, cached=False, latency_s=latency,
+                          reserved=est)
         self.cache.put(key, result)
         return self._response(req, result, spec["id"], usd=usd, cached=False, latency=latency)
 

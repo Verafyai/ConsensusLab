@@ -1,0 +1,10 @@
+id: panel-vote
+description: Three models from two families answer independently; confidence-weighted vote.
+pattern: panel
+tags: [baseline, z2]
+evidence: {retrieve: true, max_sources: 6, per_agent: shared}
+agents:
+  - {role: answerer, model: claude-sonnet, name: sonnet}
+  - {role: answerer, model: grok-fast, name: grok}
+  - {role: answerer, model: claude-haiku, name: haiku}
+aggregation: weighted

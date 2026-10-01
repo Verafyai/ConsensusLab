@@ -125,6 +125,10 @@ def validate_protocol(p: dict[str, Any], known_models: set[str] | None = None) -
             raise InvalidProtocol(f"{p['id']}: debate needs affirm and deny advocates")
     if pat == "evidence_first" and not p.get("evidence", {}).get("retrieve"):
         raise InvalidProtocol(f"{p['id']}: evidence_first needs evidence.retrieve: true")
+    if (pat == "evidence_first") != (p["aggregation"] == "stance"):
+        raise InvalidProtocol(f"{p['id']}: aggregation stance goes with pattern evidence_first")
+    if p.get("evidence", {}).get("per_agent") == "independent":
+        raise InvalidProtocol(f"{p['id']}: evidence.per_agent independent is not supported yet")
     if p["aggregation"] == "judge" and "judge" not in roles:
         raise InvalidProtocol(f"{p['id']}: aggregation judge needs a judge agent")
     if known_models is not None:

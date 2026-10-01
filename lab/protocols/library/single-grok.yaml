@@ -1,0 +1,9 @@
+id: single-grok
+description: One model (grok), one answer, with retrieved evidence. A baseline every protocol must beat.
+pattern: single
+tags: [baseline, z1]
+evidence: {retrieve: true, max_sources: 6, per_agent: shared}
+agents:
+  - {role: answerer, model: grok}
+aggregation: majority
+output: {rationale_words: 60}

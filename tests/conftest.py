@@ -12,10 +12,14 @@ FILLED_PRICES = {"input": 3.0, "output": 15.0, "cache_read": 0.3}
 @pytest.fixture
 def filled_config(tmp_path: Path) -> Path:
     """A copy of config/ with every placeholder replaced by a test value."""
+    return make_filled_config(tmp_path)
+
+
+def make_filled_config(tmp_path: Path) -> Path:
     dst = tmp_path / "config"
     shutil.copytree(paths.CONFIG, dst)
     budget = yaml.safe_load((dst / "budget.yaml").read_text())
-    budget.update(max_usd_per_item=0.10, max_usd_per_item_champion=0.08,
+    budget.update(max_usd_per_item=0.25, max_usd_per_item_champion=0.08,
                   max_usd_per_experiment=20.0, max_usd_per_day=50.0, max_usd_per_month=500.0)
     budget["social"] = {"max_usd_per_day": 2.0, "max_usd_per_month": 30.0}
     budget["season0"].update(max_usd_screening=80.0, max_usd_holdout=200.0)

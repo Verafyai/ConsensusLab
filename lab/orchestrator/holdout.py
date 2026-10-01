@@ -39,3 +39,11 @@ def load() -> list[dict]:
     items = list(read_jsonl(_path()))
     assert all(it["split"] == "holdout" for it in items)
     return items
+
+
+def runs_dir(experiment: str) -> Path:
+    """Holdout transcripts stay outside the repo, beside the holdout itself."""
+    d = paths.holdout_dir() / "runs" / experiment
+    d.mkdir(parents=True, exist_ok=True)
+    os.chmod(paths.holdout_dir(), 0o700)
+    return d

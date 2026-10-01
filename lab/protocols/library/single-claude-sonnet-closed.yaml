@@ -1,0 +1,8 @@
+id: single-claude-sonnet-closed
+description: One model, no retrieval. Measures what the model knows on its own (and memorization).
+pattern: single
+tags: [baseline, z1]
+evidence: {retrieve: false}
+agents:
+  - {role: answerer, model: claude-sonnet}
+aggregation: majority

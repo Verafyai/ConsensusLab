@@ -1,0 +1,12 @@
+id: debate-judge
+description: The Court pattern. Advocates from different families argue assigned sides for two rounds; a judge rules on the evidence.
+pattern: debate
+tags: [baseline, z4]
+evidence: {retrieve: true, max_sources: 6, per_agent: shared, judge_sees: full}
+agents:
+  - {role: advocate, side: affirm, model: claude-sonnet}
+  - {role: advocate, side: deny, model: grok-fast}
+  - {role: judge, model: claude-sonnet}
+rounds: 2
+aggregation: judge
+budget: {max_usd_per_item: 0.12}

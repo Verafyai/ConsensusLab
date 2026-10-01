@@ -1,0 +1,9 @@
+id: evidence-first
+description: Retrieve evidence; two graders from different families grade each source's stance; stances are aggregated by code.
+pattern: evidence_first
+tags: [baseline, z7]
+evidence: {retrieve: true, max_sources: 8, per_agent: shared}
+agents:
+  - {role: grader, model: claude-haiku}
+  - {role: grader, model: grok-fast}
+aggregation: stance
