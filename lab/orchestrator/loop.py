@@ -442,6 +442,10 @@ class Orchestrator:
             if paths.STOP.exists():
                 self.emit("stop", reason="ops/STOP present")
                 break
+            from lab import reports
+            today = datetime.now(UTC).date()
+            if not (paths.REPORTS / f"{today.isoformat()}.json").exists():
+                reports.write_daily(today, self.cfg)     # one digest per day
             from lab.orchestrator import jobs
             for job in jobs.pending():          # dashboard runs go first
                 jobs.run_job(self, job)
